@@ -5,21 +5,35 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <unordered_set>
+
+class Node;
+
+class NodeHashFunction;
 
 class Node {
 public:
     explicit Node(std::vector<int> indices) : _indices(std::move(indices)) {}
 
-    std::vector<Node> get_successors(const Sequences &sequences) const;
+    std::unordered_set<Node, NodeHashFunction> get_successors(const Sequences &sequences) const;
 
-    int compute_cost(const Node &other, const ScoreMatrix &mtx) const;
+    int compute_cost(const Node &other, const Sequences &sequences, const ScoreMatrix &mtx) const;
 
     int compute_heuristic(const Sequences &sequences, const ScoreMatrix &mtx) const;
 
     friend std::ostream &operator<<(std::ostream &o, const Node &node);
 
+    friend NodeHashFunction;
+
+    bool operator==(const Node &other) const;
+
 private:
-    std::vector<int> _indices;
+    const std::vector<int> _indices;
+};
+
+class NodeHashFunction {
+public:
+    std::size_t operator()(const Node &node) const;
 };
 
 std::ostream &operator<<(std::ostream &o, const Node &node);
