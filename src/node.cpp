@@ -60,14 +60,18 @@ std::size_t NodeHashFunction::operator()(const Node &node) const {
     return seed;
 }
 
-int Node::compute_heuristic(const Sequences &sequences, const ScoreMatrix &mtx) const {
-    return 0;
-}
-
 std::ostream &operator<<(std::ostream &o, const Node &node) {
     for (int i : node._indices)
         o << i << " ";
     return o;
+}
+
+int Node::operator[](int index) const {
+    return _indices.at(index);
+}
+
+size_t Node::size() const {
+    return _indices.size();
 }
 
 

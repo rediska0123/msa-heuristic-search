@@ -19,13 +19,15 @@ public:
 
     int compute_cost(const Node &other, const Sequences &sequences, const ScoreMatrix &mtx) const;
 
-    int compute_heuristic(const Sequences &sequences, const ScoreMatrix &mtx) const;
-
     friend std::ostream &operator<<(std::ostream &o, const Node &node);
 
     friend NodeHashFunction;
 
     bool operator==(const Node &other) const;
+
+    int operator[](int index) const;
+
+    size_t size() const;
 
 private:
     const std::vector<int> _indices;

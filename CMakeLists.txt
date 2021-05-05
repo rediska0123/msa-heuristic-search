@@ -3,7 +3,7 @@ project(msa-heuristic-search)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(msa STATIC src/node.cpp)
+add_library(msa STATIC src/node.cpp include/heuristic.h src/heuristic.cpp)
 target_include_directories(msa PUBLIC include)
 
 add_executable(msa_main main.cpp)

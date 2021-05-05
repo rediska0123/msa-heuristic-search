@@ -4,11 +4,11 @@
 #include <vector>
 #include <unordered_map>
 
-#define GAP '-';
-
 typedef char Symbol;
 typedef std::vector<Symbol> Sequence;
 typedef std::vector<Sequence> Sequences;
+
+const Symbol GAP = '-';
 
 typedef std::unordered_map<Symbol, std::unordered_map<Symbol, int>> ScoreMatrix;
 
