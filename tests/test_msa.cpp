@@ -1,6 +1,7 @@
 #include "node.h"
-#include "input.h"
 #include "heuristic.h"
+#include "common.h"
+#include "progressive_alignment.h"
 #include <cassert>
 #include <unordered_set>
 #include <algorithm>
@@ -8,6 +9,9 @@
 const Sequences test_sequences = {{'A', 'C', 'G', 'H'},
                                   {'C', 'F', 'G'},
                                   {'E', 'A', 'C'}};
+const AlignmentOutput test_aligned_sequences = {{GAP, 'A', 'C', GAP, 'G', 'H'},
+                                                {GAP, GAP, 'C', 'F', 'G', GAP},
+                                                {'E', 'A', 'C', GAP, GAP, GAP}};
 const ScoreMatrix test_matrix = {{'-', {{'-', 8}, {'A', 8},  {'C', 8},   {'E', 8},  {'F', 8},  {'G', 8},  {'H', 8}}},
                                  {'A', {{'-', 8}, {'A', -2}, {'C', 2},   {'E', 0},  {'F', 4},  {'G', -1}, {'H', 1}}},
                                  {'C', {{'-', 8}, {'A', 2},  {'C', -12}, {'E', 5},  {'F', 4},  {'G', 3},  {'H', 3}}},
@@ -54,10 +58,23 @@ void test_calculate_heuristic() {
     assert_eq(heuristic_calculator.calculate_heuristic(Node({0, 0, 0})), 3 + 10 + 12);
 }
 
+void test_calculate_alignment_score() {
+    assert_eq(calculate_alignment_score(test_aligned_sequences, test_matrix), 61);
+}
+
+void test_progressive_alignment() {
+    assert(progressive_alignment(test_sequences, test_matrix) ==
+        AlignmentOutput({Sequence({'-', 'A', 'C', 'G', 'H'}),
+                         Sequence({'-', '-', 'C', 'F', 'G'}),
+                         Sequence({'E', 'A', 'C', '-', '-'})}));
+}
+
 int main() {
     test_compute_cost();
     test_get_successors();
     test_calculate_heuristic();
+    test_calculate_alignment_score();
+    test_progressive_alignment();
 
     return 0;
 }

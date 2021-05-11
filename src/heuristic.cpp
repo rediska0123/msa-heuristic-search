@@ -1,6 +1,5 @@
 #include "heuristic.h"
-
-const int INF = 2e9;
+#include "utils.h"
 
 void relax(int &val, int new_val) {
     if (val > new_val)

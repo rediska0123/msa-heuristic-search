@@ -2,6 +2,8 @@
 #include "node.h"
 #include "input.h"
 #include "heuristic.h"
+#include "common.h"
+#include "progressive_alignment.h"
 
 using namespace std;
 
@@ -13,7 +15,7 @@ int main() {
                           {'B', {{'A', 0},  {'B', -1}, {'C', 0},  {'D', 0},  {'-', 0}}},
                           {'C', {{'A', 0},  {'B', 0},  {'C', -1}, {'D', 0},  {'-', 0}}},
                           {'D', {{'A', 0},  {'B', 0},  {'C', 0},  {'D', -1}, {'-', 0}}},
-                          {'-', {{'A', 0},  {'B', 0},  {'C', 0},  {'D', 0},  {'-', -1}}}};
+                          {'-', {{'A', 0},  {'B', 0},  {'C', 0},  {'D', 0},  {'-', 0}}}};
 
     Node node1({1, 1, 0});
     Node node2({2, 1, 1});
@@ -25,6 +27,14 @@ int main() {
 
     HeuristicCalculator heuristic_calculator(sequences, matrix);
     cout << heuristic_calculator.calculate_heuristic(node1) << endl;
+
+    AlignmentOutput progressive_alignment_output = progressive_alignment(sequences, matrix);
+    for (const Sequence &s : progressive_alignment_output) {
+        for (const Symbol &c : s)
+            cout << c;
+        cout << endl;
+    }
+    cout << calculate_alignment_score(progressive_alignment_output, matrix) << endl;
 
     return 0;
 }
