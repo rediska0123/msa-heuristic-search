@@ -5,7 +5,10 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <queue>
 #include <unordered_set>
+#include <unordered_map>
+#include <memory>
 
 class Node;
 
@@ -13,7 +16,10 @@ class NodeHashFunction;
 
 class Node {
 public:
-    explicit Node(std::vector<int> indices) : _indices(std::move(indices)) {}
+    explicit Node(std::vector<int> indices) : _indices(std::move(indices)), _parent(std::shared_ptr<Node>(nullptr)) {}
+
+    Node(std::vector<int> indices, std::shared_ptr<const Node> parent) : _indices(std::move(indices)),
+                                                                         _parent(std::move(parent)) {}
 
     std::unordered_set<Node, NodeHashFunction> get_successors(const Sequences &sequences) const;
 
@@ -29,8 +35,11 @@ public:
 
     size_t size() const;
 
+    const Node *get_parent() const;
+
 private:
-    const std::vector<int> _indices;
+    std::vector<int> _indices;
+    std::shared_ptr<const Node> _parent;
 };
 
 class NodeHashFunction {

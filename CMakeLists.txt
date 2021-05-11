@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(msa-heuristic-search)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-add_library(msa STATIC src/node.cpp include/heuristic.h src/heuristic.cpp include/progressive_alignment.h src/progressive_alignment.cpp include/utils.h include/common.h src/common.cpp)
+
+add_library(msa STATIC src/node.cpp src/heuristic.cpp src/progressive_alignment.cpp src/common.cpp  src/heuristic_algorithms.cpp)
 target_include_directories(msa PUBLIC include)
 
 add_executable(msa_main main.cpp)

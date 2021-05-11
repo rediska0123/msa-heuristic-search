@@ -2,6 +2,7 @@
 #include "heuristic.h"
 #include "common.h"
 #include "progressive_alignment.h"
+#include "heuristic_algorithms.h"
 #include <cassert>
 #include <unordered_set>
 #include <algorithm>
@@ -69,12 +70,19 @@ void test_progressive_alignment() {
                          Sequence({'E', 'A', 'C', '-', '-'})}));
 }
 
+void test_AStar() {
+    HeuristicCalculator heuristic_calculator(test_sequences, test_matrix);
+    SearchResult result = AStar(test_sequences, test_matrix);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix), 36);
+}
+
 int main() {
     test_compute_cost();
     test_get_successors();
     test_calculate_heuristic();
     test_calculate_alignment_score();
     test_progressive_alignment();
+    test_AStar();
 
     return 0;
 }
