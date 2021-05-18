@@ -4,6 +4,8 @@
 #include "heuristic.h"
 #include "common.h"
 #include "progressive_alignment.h"
+#include "anytime_astar.h"
+#include "heuristic_algorithms.h"
 
 using namespace std;
 
@@ -17,24 +19,32 @@ int main() {
                           {'D', {{'A', 0},  {'B', 0},  {'C', 0},  {'D', -1}, {'-', 0}}},
                           {'-', {{'A', 0},  {'B', 0},  {'C', 0},  {'D', 0},  {'-', 0}}}};
 
-    Node node1({1, 1, 0});
-    Node node2({2, 1, 1});
-
-    cout << node1.compute_cost(node2, sequences, matrix) << endl;
-    for (const Node &n : node1.get_successors(sequences)) {
-        cout << n << endl;
-    }
-
-    HeuristicCalculator heuristic_calculator(sequences, matrix);
-    cout << heuristic_calculator.calculate_heuristic(node1) << endl;
-
+    cout << "Progressive alignment:" << endl;
     AlignmentOutput progressive_alignment_output = progressive_alignment(sequences, matrix);
     for (const Sequence &s : progressive_alignment_output) {
         for (const Symbol &c : s)
             cout << c;
         cout << endl;
     }
-    cout << calculate_alignment_score(progressive_alignment_output, matrix) << endl;
+    cout << calculate_alignment_score(progressive_alignment_output, matrix) << endl << endl;
+
+    cout << "A*:" << endl;
+    SearchResult astar_output = AStar(sequences, matrix);
+    for (const Sequence &s : astar_output.alignment) {
+        for (const Symbol &c : s)
+            cout << c;
+        cout << endl;
+    }
+    cout << calculate_alignment_score(astar_output.alignment, matrix) << endl << endl;
+
+    cout << "AnytimeA*:" << endl;
+    SearchResult anytime_astar_output = AnytimeAStar(sequences, matrix, 10);
+    for (const Sequence &s : anytime_astar_output.alignment) {
+        for (const Symbol &c : s)
+            cout << c;
+        cout << endl;
+    }
+    cout << calculate_alignment_score(anytime_astar_output.alignment, matrix) << endl;
 
     return 0;
 }

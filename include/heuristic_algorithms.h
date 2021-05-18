@@ -18,6 +18,8 @@ public:
 
     bool is_empty() override;
 
+    std::vector<Node> get_nodes() override;
+
 private:
     struct Comparator {
         constexpr bool operator()(
@@ -41,7 +43,9 @@ public:
 
     void add_node(const Node &node);
 
-private:
+    std::vector<Node> get_nodes();
+
+protected:
     std::unordered_set<Node, NodeHashFunction> _nodes;
 };
 

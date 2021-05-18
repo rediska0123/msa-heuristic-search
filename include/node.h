@@ -21,6 +21,8 @@ public:
     Node(std::vector<int> indices, std::shared_ptr<const Node> parent) : _indices(std::move(indices)),
                                                                          _parent(std::move(parent)) {}
 
+    void set_parent(std::shared_ptr<const Node> parent) { _parent = std::move(parent); }
+
     std::unordered_set<Node, NodeHashFunction> get_successors(const Sequences &sequences) const;
 
     int compute_cost(const Node &other, const Sequences &sequences, const ScoreMatrix &mtx) const;

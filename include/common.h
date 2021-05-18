@@ -11,12 +11,16 @@ class Open {
 public:
     virtual std::pair<Node, int> get_best_node() = 0;
 
+    virtual std::vector<Node> get_nodes() = 0;
+
     virtual bool is_empty() = 0;
 };
 
 class Closed {
 public:
     virtual bool was_expanded(const Node &node) = 0;
+
+    virtual std::vector<Node> get_nodes() = 0;
 };
 
 struct SearchResult {

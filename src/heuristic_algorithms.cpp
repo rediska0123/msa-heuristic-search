@@ -31,12 +31,26 @@ void OpenAStar::_remove_old_nodes() {
     }
 }
 
+std::vector<Node> OpenAStar::get_nodes() {
+    std::vector<Node> nodes;
+    std::priority_queue<std::pair<int, Node>, std::vector<std::pair<int, Node>>, Comparator> tmp = _nodes;
+    while (!tmp.empty()) {
+        nodes.push_back(tmp.top().second);
+        tmp.pop();
+    }
+    return nodes;
+}
+
 void ClosedAStar::add_node(const Node &node) {
     _nodes.insert(node);
 }
 
 bool ClosedAStar::was_expanded(const Node &node) {
     return _nodes.find(node) != _nodes.end();
+}
+
+std::vector<Node> ClosedAStar::get_nodes() {
+    return std::vector<Node>(_nodes.begin(), _nodes.end());
 }
 
 SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
