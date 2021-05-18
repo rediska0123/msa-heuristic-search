@@ -106,7 +106,8 @@ std::pair<Sequences, ScoreMatrix> gen_simple_test() {
     ScoreMatrix m;
     for (int i = 0; i < (int) alphabet.size(); i++)
         for (int j = i; j < (int) alphabet.size(); j++)
-            m[alphabet[i]][alphabet[j]] = m[alphabet[j]][alphabet[i]] = rand() % 11;
+            m[alphabet[i]][alphabet[j]] = m[alphabet[j]][alphabet[i]] = rand() % 21 - 1;
+    m['-']['-'] = rand() % 11;  // must be non-negative for monotone heuristic
     return {seqs, m};
 }
 
