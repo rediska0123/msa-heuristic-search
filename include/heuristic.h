@@ -7,7 +7,7 @@ class HeuristicCalculator {
 public:
     HeuristicCalculator(const Sequences &sequences, const ScoreMatrix &mtx);
 
-    int calculate_heuristic(const Node &node);
+    int calculate_heuristic(const Node &node) const;
 
 private:
     std::vector<std::vector<std::vector<std::vector<int>>>> _pair_heuristic;

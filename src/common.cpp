@@ -2,6 +2,15 @@
 #include "node.h"
 #include <algorithm>
 
+std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment) {
+    for (const Sequence &s : alignment) {
+        for (const Symbol &c : s)
+            o << c;
+        o << "\n";
+    }
+    return o;
+}
+
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx) {
     int score = 0;
     for (int pos = 0; pos < (int) alignment[0].size(); pos++)
@@ -9,6 +18,15 @@ int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatri
             for (int j = 0; j < i; j++)
                 score += mtx.at(alignment[i][pos]).at(alignment[j][pos]);
     return score;
+}
+
+std::pair<Node, Node> get_start_and_goal_nodes(const Sequences &sequences) {
+    Node start_node = Node(std::vector<int>((int)sequences.size(), 0));
+    std::vector<int> goal_indices = std::vector<int>((int)sequences.size(), 0);
+    std::transform(sequences.begin(), sequences.end(), goal_indices.begin(),
+                   [](const Sequence &s) { return s.size(); });
+    Node goal_node = Node(std::move(goal_indices));
+    return {start_node, goal_node};
 }
 
 std::vector<Node> get_path(Node *node) {

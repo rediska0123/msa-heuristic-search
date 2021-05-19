@@ -2,8 +2,9 @@
 #include "heuristic.h"
 #include "common.h"
 #include "progressive_alignment.h"
-#include "heuristic_algorithms.h"
+#include "astar.h"
 #include "anytime_astar.h"
+#include "idastar.h"
 #include <cassert>
 #include <unordered_set>
 #include <algorithm>
@@ -94,6 +95,14 @@ void test_AnytimeAStar() {
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
 }
 
+void test_IDAStar() {
+    SearchResult result = IDAStar(test_sequences1, test_matrix1);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix1), 36);
+
+    result = IDAStar(test_sequences2, test_matrix2);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+}
+
 std::pair<Sequences, ScoreMatrix> gen_simple_test() {
     std::vector<Symbol> alphabet = {'A', 'B', 'C', '-'};
     int n = rand() % 4 + 1;
@@ -112,11 +121,16 @@ std::pair<Sequences, ScoreMatrix> gen_simple_test() {
 }
 
 void test_same_aligment_scores() {
-    for (int iter = 0; iter < 100; iter++) {
+    for (int iter = 0; iter < 50; iter++) {
         auto[seqs, m] = gen_simple_test();
         SearchResult astar = AStar(seqs, m);
         SearchResult anytime_astar = AnytimeAStar(seqs, m, rand() % 10 + 1);
-        assert_eq(calculate_alignment_score(astar.alignment, m), calculate_alignment_score(anytime_astar.alignment, m));
+        SearchResult idastar = IDAStar(seqs, m);
+        int astar_score = calculate_alignment_score(astar.alignment, m);
+        int anytime_astar_score = calculate_alignment_score(anytime_astar.alignment, m);
+        int idastar_score = calculate_alignment_score(idastar.alignment, m);
+        assert_eq(astar_score, anytime_astar_score);
+        assert_eq(astar_score, idastar_score);
     }
 }
 
@@ -128,6 +142,7 @@ int main() {
     test_progressive_alignment();
     test_AStar();
     test_AnytimeAStar();
+    test_IDAStar();
     test_same_aligment_scores();
 
     return 0;

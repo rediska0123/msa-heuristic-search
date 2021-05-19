@@ -32,7 +32,7 @@ HeuristicCalculator::HeuristicCalculator(const Sequences &sequences, const Score
     }
 }
 
-int HeuristicCalculator::calculate_heuristic(const Node &node) {
+int HeuristicCalculator::calculate_heuristic(const Node &node) const {
     int h = 0;
     for (int i = 0; i < (int) node.size(); i++)
         for (int j = 0; j < i; j++)

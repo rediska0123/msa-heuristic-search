@@ -7,6 +7,8 @@
 
 typedef std::vector<Sequence> AlignmentOutput;
 
+std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment);
+
 class Open {
 public:
     virtual std::pair<Node, int> get_best_node() = 0;
@@ -30,6 +32,8 @@ struct SearchResult {
 };
 
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx);
+
+std::pair<Node, Node> get_start_and_goal_nodes(const Sequences &sequences);
 
 std::vector<Node> get_path(Node *node);
 

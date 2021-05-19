@@ -1,4 +1,4 @@
-#include "heuristic_algorithms.h"
+#include "astar.h"
 #include "heuristic.h"
 #include "node.h"
 #include "common.h"
@@ -55,16 +55,11 @@ std::vector<Node> ClosedAStar::get_nodes() {
 
 SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
-    const size_t N = sequences.size();
 
     std::shared_ptr<ClosedAStar> closed = std::make_shared<ClosedAStar>();
     std::shared_ptr<OpenAStar> open = std::make_shared<OpenAStar>(std::shared_ptr<ClosedAStar>(closed));
 
-    Node start_node = Node(std::vector<int>(N, 0));
-    std::vector<int> goal_indices = std::vector<int>(N, 0);
-    std::transform(sequences.begin(), sequences.end(), goal_indices.begin(),
-                   [](const Sequence &s) { return s.size(); });
-    Node goal_node = Node(std::move(goal_indices));
+    auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
     open->add_node(start_node, 0, hc.calculate_heuristic(start_node));
     while (!open->is_empty()) {

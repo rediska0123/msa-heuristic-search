@@ -1,5 +1,5 @@
-#ifndef MSA_HEURISTIC_SEARCH_HEURISTIC_ALGORITHMS_H
-#define MSA_HEURISTIC_SEARCH_HEURISTIC_ALGORITHMS_H
+#ifndef MSA_HEURISTIC_SEARCH_ASTAR_H
+#define MSA_HEURISTIC_SEARCH_ASTAR_H
 
 #include "input.h"
 #include "node.h"
@@ -52,4 +52,4 @@ protected:
 
 SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx);
 
-#endif //MSA_HEURISTIC_SEARCH_HEURISTIC_ALGORITHMS_H
+#endif //MSA_HEURISTIC_SEARCH_ASTAR_H

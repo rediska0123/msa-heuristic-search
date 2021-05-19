@@ -1,5 +1,6 @@
 #include <algorithm>
-#include "heuristic_algorithms.h"
+#include <cassert>
+#include "astar.h"
 #include "heuristic.h"
 #include "anytime_astar.h"
 #include "utils.h"
@@ -29,18 +30,14 @@ std::vector<Node> ClosedAnytimeAStar::get_nodes() {
 }
 
 SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, int w) {
+    assert(w >= 1);
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
-    const size_t N = sequences.size();
 
     std::shared_ptr<ClosedAnytimeAStar> closed = std::make_shared<ClosedAnytimeAStar>();
     std::shared_ptr<OpenAStar> open = std::make_shared<OpenAStar>(
             std::shared_ptr<ClosedAnytimeAStar>(closed));
 
-    Node start_node = Node(std::vector<int>(N, 0));
-    std::vector<int> goal_indices = std::vector<int>(N, 0);
-    std::transform(sequences.begin(), sequences.end(), goal_indices.begin(),
-                   [](const Sequence &s) { return s.size(); });
-    Node goal_node = Node(std::move(goal_indices));
+    auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
     open->add_node(start_node, 0, w * hc.calculate_heuristic(start_node));
     Node incumbent({});
