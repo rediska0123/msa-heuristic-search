@@ -60,7 +60,9 @@ SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, in
                 f_value[nxt] = g + c;
                 incumbent = Node(nxt);
             } else {
-                if (closed->was_expanded(nxt) and closed->g_value(nxt) > g + c)
+                if (closed->was_expanded(nxt) and closed->g_value(nxt) <= g + c)
+                    continue;
+                if (closed->was_expanded(nxt))
                     closed->delete_node(nxt);
                 open->add_node(nxt, g + c, g + c + w * h);
                 f_value[nxt] = f_value.count(nxt) != 0 ? std::min(f_value[nxt], g + c + h) : g + c + h;
