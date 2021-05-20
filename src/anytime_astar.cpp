@@ -22,9 +22,9 @@ SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, in
     f_value[start_node] = hc.calculate_heuristic(start_node);
     while (!open->is_empty()) {
         auto[best_node, g, _] = open->get_best_node();
-        closed->add_node(best_node, g);
         if (f_value[best_node] >= f_incumbent)
             continue;
+        closed->add_node(best_node, g);
         for (Node nxt: best_node.get_successors(sequences)) {
             int h = hc.calculate_heuristic(nxt), c = best_node.compute_cost(nxt, sequences, mtx);
             if (g + c + h >= f_incumbent)
