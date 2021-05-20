@@ -2,70 +2,20 @@
 #include "heuristic.h"
 #include "node.h"
 #include "common.h"
-#include <vector>
-#include <unordered_map>
 #include <algorithm>
-
-
-std::tuple<Node, int, int> OpenAStar::get_best_node() {
-    _remove_old_nodes();
-    auto [f, best_node] = _nodes.top();
-    _nodes.pop();
-    return {best_node, _g_values[best_node], f};
-}
-
-void OpenAStar::add_node(const Node &node, int g, int f) {
-    if (_g_values.find(node) == _g_values.end() || _g_values[node] >= g) {
-        _nodes.push({f, node});
-        _g_values[node] = g;
-    }
-}
-
-bool OpenAStar::is_empty() {
-    _remove_old_nodes();
-    return _nodes.empty();
-}
-
-void OpenAStar::_remove_old_nodes() {
-    while (!_nodes.empty() && _closed->was_expanded(_nodes.top().second)) {
-        _nodes.pop();
-    }
-}
-
-std::vector<Node> OpenAStar::get_nodes() {
-    std::vector<Node> nodes;
-    std::priority_queue<std::pair<int, Node>, std::vector<std::pair<int, Node>>, Comparator> tmp = _nodes;
-    while (!tmp.empty()) {
-        nodes.push_back(tmp.top().second);
-        tmp.pop();
-    }
-    return nodes;
-}
-
-void ClosedAStar::add_node(const Node &node) {
-    _nodes.insert(node);
-}
-
-bool ClosedAStar::was_expanded(const Node &node) {
-    return _nodes.find(node) != _nodes.end();
-}
-
-std::vector<Node> ClosedAStar::get_nodes() {
-    return std::vector<Node>(_nodes.begin(), _nodes.end());
-}
 
 SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
-    std::shared_ptr<ClosedAStar> closed = std::make_shared<ClosedAStar>();
-    std::shared_ptr<OpenAStar> open = std::make_shared<OpenAStar>(std::shared_ptr<ClosedAStar>(closed));
+    std::shared_ptr<Closed> closed = std::make_shared<Closed>();
+    std::shared_ptr<Open> open = std::make_shared<Open>(std::shared_ptr<Closed>(closed));
 
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
     open->add_node(start_node, 0, hc.calculate_heuristic(start_node));
     while (!open->is_empty()) {
         auto[best_node, g, _] = open->get_best_node();
-        closed->add_node(best_node);
+        closed->add_node(best_node, g);
         if (best_node == goal_node) {
             return SearchResult{path_to_alignment(sequences, get_path(&best_node)),
                                 std::shared_ptr<Open>(open), std::shared_ptr<Closed>(closed)};

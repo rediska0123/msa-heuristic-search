@@ -9,20 +9,53 @@ typedef std::vector<Sequence> AlignmentOutput;
 
 std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment);
 
+class Open;
+
+class Closed;
+
 class Open {
 public:
-    virtual std::tuple<Node, int, int> get_best_node() = 0;
+    explicit Open(std::shared_ptr<Closed> closed) : _closed(std::move(closed)) {};
 
-    virtual std::vector<Node> get_nodes() = 0;
+    std::tuple<Node, int, int> get_best_node();
 
-    virtual bool is_empty() = 0;
+    void add_node(const Node &node, int g, int f);
+
+    bool is_empty();
+
+    std::vector<Node> get_nodes();
+
+private:
+    struct Comparator {
+        constexpr bool operator()(
+                std::pair<int, Node> const &a,
+                std::pair<int, Node> const &b)
+        const noexcept {
+            return a.first > b.first;
+        }
+    };
+
+    std::shared_ptr<Closed> _closed;
+    std::priority_queue<std::pair<int, Node>, std::vector<std::pair<int, Node>>, Comparator> _nodes;
+    std::unordered_map<Node, int, NodeHashFunction> _g_values;
+
+    void _remove_old_nodes();
 };
 
 class Closed {
 public:
-    virtual bool was_expanded(const Node &node) = 0;
+    void add_node(const Node &node, int g);
 
-    virtual std::vector<Node> get_nodes() = 0;
+    void delete_node(const Node &node);
+
+    bool was_expanded(const Node &node);
+
+    int g_value(const Node &node);
+
+    std::vector<Node> get_nodes();
+
+private:
+    std::unordered_map<Node, int, NodeHashFunction> _g_values;
 };
 
 struct SearchResult {

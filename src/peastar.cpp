@@ -1,13 +1,11 @@
 #include "peastar.h"
-#include "astar.h"
-#include "anytime_astar.h"
-#include "algorithm"
+#include <algorithm>
 
 SearchResult PEAStar(const Sequences &sequences, const ScoreMatrix &mtx, int C) {
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
-    std::shared_ptr<ClosedAnytimeAStar> closed = std::make_shared<ClosedAnytimeAStar>();
-    std::shared_ptr<OpenAStar> open = std::make_shared<OpenAStar>(std::shared_ptr<ClosedAnytimeAStar>(closed));
+    std::shared_ptr<Closed> closed = std::make_shared<Closed>();
+    std::shared_ptr<Open> open = std::make_shared<Open>(std::shared_ptr<Closed>(closed));
 
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 

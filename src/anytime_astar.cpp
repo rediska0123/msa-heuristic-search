@@ -1,41 +1,16 @@
 #include <algorithm>
 #include <cassert>
-#include "astar.h"
 #include "heuristic.h"
-#include "anytime_astar.h"
 #include "utils.h"
 #include "common.h"
-
-void ClosedAnytimeAStar::delete_node(const Node &node) {
-    _g_values.erase(node);
-}
-
-bool ClosedAnytimeAStar::was_expanded(const Node &node) {
-    return _g_values.count(node) != 0;
-}
-
-int ClosedAnytimeAStar::g_value(const Node &node) {
-    return _g_values[node];
-}
-
-void ClosedAnytimeAStar::add_node(const Node &node, int g) {
-    _g_values[node] = g;
-}
-
-std::vector<Node> ClosedAnytimeAStar::get_nodes() {
-    std::vector<Node> nodes;
-    for (std::pair<Node, int> p : _g_values)
-        nodes.push_back(p.first);
-    return nodes;
-}
 
 SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, int w) {
     assert(w >= 1);
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
-    std::shared_ptr<ClosedAnytimeAStar> closed = std::make_shared<ClosedAnytimeAStar>();
-    std::shared_ptr<OpenAStar> open = std::make_shared<OpenAStar>(
-            std::shared_ptr<ClosedAnytimeAStar>(closed));
+    std::shared_ptr<Closed> closed = std::make_shared<Closed>();
+    std::shared_ptr<Open> open = std::make_shared<Open>(
+            std::shared_ptr<Closed>(closed));
 
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
