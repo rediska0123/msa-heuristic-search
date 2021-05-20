@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+bb3_release/
+data/
