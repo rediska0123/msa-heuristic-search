@@ -10,11 +10,12 @@ SearchResult PEAStar(const Sequences &sequences, const ScoreMatrix &mtx, int C) 
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
     open->add_node(start_node, 0, hc.calculate_heuristic(start_node));
+    ProgressTracker tracker;
     while (!open->is_empty()) {
+        tracker.on_new_iteration(*open, *closed);
         auto[best_node, g, F] = open->get_best_node();
         if (best_node == goal_node) {
-            return SearchResult{path_to_alignment(sequences, get_path(&best_node)),
-                                std::shared_ptr<Open>(open), std::shared_ptr<Closed>(closed)};
+            return SearchResult(path_to_alignment(sequences, get_path(&best_node)), tracker);
         }
         std::vector<int> unpromising_node_values;
         for (const Node &node: best_node.get_successors(sequences)) {
@@ -41,6 +42,5 @@ SearchResult PEAStar(const Sequences &sequences, const ScoreMatrix &mtx, int C) 
             open->add_node(best_node, g, new_F);
         }
     }
-    return SearchResult{path_to_alignment(sequences, get_path(&goal_node)), std::shared_ptr<Open>(open),
-                        std::shared_ptr<Closed>(closed)};
+    return SearchResult(path_to_alignment(sequences, get_path(&goal_node)), tracker);
 }

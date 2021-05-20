@@ -25,6 +25,8 @@ public:
 
     std::vector<Node> get_nodes();
 
+    size_t size() const;
+
 private:
     struct Comparator {
         constexpr bool operator()(
@@ -54,14 +56,31 @@ public:
 
     std::vector<Node> get_nodes();
 
+    size_t size() const;
+
 private:
     std::unordered_map<Node, int, NodeHashFunction> _g_values;
 };
 
+class ProgressTracker {
+public:
+    ProgressTracker() = default;
+
+    void on_new_iteration(const Open &open, const Closed &closed);
+
+    int get_max_nodes_in_memory() const;
+
+    int get_iterations_num() const;
+protected:
+    int _max_nodes_in_memory;
+    int _iterations_num;
+};
+
 struct SearchResult {
+    SearchResult(const AlignmentOutput &a, const ProgressTracker &tracker);
     AlignmentOutput alignment;
-    std::shared_ptr<Open> open;
-    std::shared_ptr<Closed> closed;
+    int max_nodes_in_memory;
+    int iterations_num;
 };
 
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx);

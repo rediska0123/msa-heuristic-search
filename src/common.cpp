@@ -48,6 +48,10 @@ std::vector<Node> Open::get_nodes() {
     return nodes;
 }
 
+size_t Open::size() const {
+    return _nodes.size();
+}
+
 void Closed::delete_node(const Node &node) {
     _g_values.erase(node);
 }
@@ -69,6 +73,10 @@ std::vector<Node> Closed::get_nodes() {
     for (std::pair<Node, int> p : _g_values)
         nodes.push_back(p.first);
     return nodes;
+}
+
+size_t Closed::size() const {
+    return _g_values.size();
 }
 
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx) {
@@ -147,4 +155,23 @@ ScoreMatrix parse_matrix_file(const std::string &filepath) {
             m[i][j] = -m[i][j];
         }
     return m;
+}
+
+void ProgressTracker::on_new_iteration(const Open &open, const Closed &closed) {
+    _max_nodes_in_memory = std::max(_max_nodes_in_memory, (int)open.size() + (int)closed.size());
+    _iterations_num += 1;
+}
+
+int ProgressTracker::get_max_nodes_in_memory() const {
+    return _max_nodes_in_memory;
+}
+
+int ProgressTracker::get_iterations_num() const {
+    return _iterations_num;
+}
+
+SearchResult::SearchResult(const AlignmentOutput &a, const ProgressTracker &tracker) {
+    alignment = a;
+    max_nodes_in_memory = tracker.get_max_nodes_in_memory();
+    iterations_num = tracker.get_iterations_num();
 }

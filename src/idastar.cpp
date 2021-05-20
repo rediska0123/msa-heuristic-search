@@ -4,8 +4,9 @@
 #include "utils.h"
 #include "cassert"
 
-int search(const Sequences &seqs, const ScoreMatrix &mtx, const HeuristicCalculator &hc, const Node &goal_node,
-           std::vector<Node> &path, int g, int bound) {
+int search(IDAStarProgressTracker &tracker, const Sequences &seqs, const ScoreMatrix &mtx,
+           const HeuristicCalculator &hc, const Node &goal_node, std::vector<Node> &path, int g, int bound) {
+    tracker.on_new_iteration(path);
     Node n = path.back();
     int f = g + hc.calculate_heuristic(n);
     if (f > bound)
@@ -17,7 +18,7 @@ int search(const Sequences &seqs, const ScoreMatrix &mtx, const HeuristicCalcula
         // the graph is acyclic, so no need to check whether nxt is in path
         path.push_back(nxt);
         int c = n.compute_cost(nxt, seqs, mtx);
-        int t = search(seqs, mtx, hc, goal_node, path, g + c, bound);
+        int t = search(tracker, seqs, mtx, hc, goal_node, path, g + c, bound);
         if (t == -INF)
             return -INF;
         min_bound = std::min(min_bound, t);
@@ -32,13 +33,17 @@ SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx) {
 
     int bound = hc.calculate_heuristic(start_node);
     std::vector<Node> path = {start_node};
+    IDAStarProgressTracker tracker;
     while (true) {
-        bound = search(sequences, mtx, hc, goal_node, path, 0, bound);
+        bound = search(tracker, sequences, mtx, hc, goal_node, path, 0, bound);
         assert(bound != INF);
         if (bound == -INF)
-            return SearchResult{path_to_alignment(sequences, path), std::shared_ptr<Open>(),
-                                std::shared_ptr<Closed>()};
+            return SearchResult(path_to_alignment(sequences, path), tracker);
     }
+    assert(false), "No path found";
+}
 
-    return SearchResult();
+void IDAStarProgressTracker::on_new_iteration(const std::vector<Node> &path) {
+    _iterations_num += 1;
+    _max_nodes_in_memory = std::max(_max_nodes_in_memory, (int)path.size());
 }

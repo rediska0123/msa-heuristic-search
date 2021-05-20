@@ -1,10 +1,12 @@
 #include <algorithm>
 #include <cassert>
+#include <anytime_astar.h>
+
 #include "heuristic.h"
 #include "utils.h"
 #include "common.h"
 
-SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, int w) {
+AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, int w) {
     assert(w >= 1);
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
@@ -20,8 +22,10 @@ SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, in
 
     std::unordered_map<Node, int, NodeHashFunction> f_value;
     f_value[start_node] = hc.calculate_heuristic(start_node);
+    AnytimeProgressTracker tracker;
     while (!open->is_empty()) {
-        auto[best_node, g, _] = open->get_best_node();
+        auto[best_node, g, f] = open->get_best_node();
+        tracker.on_new_iteration(*open, *closed, f, f_incumbent);
         if (f_value[best_node] >= f_incumbent)
             continue;
         closed->add_node(best_node, g);
@@ -45,7 +49,19 @@ SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, in
         }
     }
 
-    return SearchResult{path_to_alignment(sequences, get_path(&incumbent)),
-                        std::shared_ptr<Open>(open),
-                        std::shared_ptr<Closed>(closed)};
+    return AnytimeAStarSearchResult(path_to_alignment(sequences, get_path(&incumbent)), tracker);
+}
+
+void AnytimeProgressTracker::on_new_iteration(const Open &open, const Closed &closed, int min_bound, int max_bound) {
+    ProgressTracker::on_new_iteration(open, closed);
+    _bounds.emplace_back(min_bound, max_bound);
+}
+
+std::vector<std::pair<int, int>> AnytimeProgressTracker::get_bounds() const {
+    return _bounds;
+}
+
+AnytimeAStarSearchResult::AnytimeAStarSearchResult(const AlignmentOutput &a, const AnytimeProgressTracker &tracker)
+        : SearchResult(a, tracker) {
+    bounds = {};
 }
