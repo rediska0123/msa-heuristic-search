@@ -32,4 +32,4 @@
 *.app
 
 bb3_release/
-data/
+data/sequences/

@@ -72,4 +72,8 @@ std::vector<Node> get_path(Node *node);
 
 AlignmentOutput path_to_alignment(const Sequences &sequences, const std::vector<Node> &path);
 
+std::pair<Sequences, AlignmentOutput> parse_data_file(const std::string &filepath);
+
+ScoreMatrix parse_matrix_file(const std::string &filepath);
+
 #endif //MSA_HEURISTIC_SEARCH_COMMON_H

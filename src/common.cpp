@@ -1,6 +1,8 @@
 #include "common.h"
 #include "node.h"
 #include <algorithm>
+#include <fstream>
+#include <cassert>
 
 std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment) {
     for (const Sequence &s : alignment) {
@@ -112,3 +114,37 @@ AlignmentOutput path_to_alignment(const Sequences &sequences, const std::vector<
     return output;
 }
 
+std::pair<Sequences, AlignmentOutput> parse_data_file(const std::string &filepath) {
+    std::ifstream f(filepath);
+    std::vector<Sequence> all_seqs;
+    for (std::string line; getline(f, line);) {
+        std::vector<char> seq;
+        for (char c : line)
+            seq.push_back(c);
+        all_seqs.push_back(seq);
+    }
+    assert(!all_seqs.empty()), "Empty file";
+    Sequences seqs;
+    AlignmentOutput outp;
+    for (int i = 0; i < (int) all_seqs.size() / 2; i++)
+        seqs.push_back(all_seqs[i]);
+    for (int i = (int) all_seqs.size() / 2; i < (int) all_seqs.size(); i++)
+        outp.push_back(all_seqs[i]);
+    return {seqs, outp};
+}
+
+ScoreMatrix parse_matrix_file(const std::string &filepath) {
+    std::ifstream f(filepath);
+    int symbols_num;
+    f >> symbols_num;
+    std::vector<char> symbols(symbols_num + 1);
+    for (int i = 0; i < symbols_num + 1; i++)
+        f >> symbols[i];
+    ScoreMatrix m;
+    for (char i : symbols)
+        for (char j : symbols) {
+            f >> m[i][j];
+            m[i][j] = -m[i][j];
+        }
+    return m;
+}

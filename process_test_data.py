@@ -54,7 +54,7 @@ if __name__ == '__main__':
                         default=15)
     parser.add_argument('--output_dir',
                         help='Directory to score processed data.',
-                        default='data')
+                        default='data/sequences')
     args = parser.parse_args()
 
     if not os.path.exists(args.output_dir):
