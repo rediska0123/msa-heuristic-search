@@ -46,7 +46,7 @@ SearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, in
     std::unordered_map<Node, int, NodeHashFunction> f_value;
     f_value[start_node] = hc.calculate_heuristic(start_node);
     while (!open->is_empty()) {
-        auto[best_node, g] = open->get_best_node();
+        auto[best_node, g, _] = open->get_best_node();
         closed->add_node(best_node, g);
         if (f_value[best_node] >= f_incumbent)
             continue;

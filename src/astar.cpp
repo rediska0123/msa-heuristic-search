@@ -7,14 +7,15 @@
 #include <algorithm>
 
 
-std::pair<Node, int> OpenAStar::get_best_node() {
+std::tuple<Node, int, int> OpenAStar::get_best_node() {
     _remove_old_nodes();
-    Node best_node = _nodes.top().second;
-    return {best_node, _g_values[best_node]};
+    auto [f, best_node] = _nodes.top();
+    _nodes.pop();
+    return {best_node, _g_values[best_node], f};
 }
 
 void OpenAStar::add_node(const Node &node, int g, int f) {
-    if (_g_values.find(node) == _g_values.end() || _g_values[node] > g) {
+    if (_g_values.find(node) == _g_values.end() || _g_values[node] >= g) {
         _nodes.push({f, node});
         _g_values[node] = g;
     }
@@ -63,7 +64,7 @@ SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
 
     open->add_node(start_node, 0, hc.calculate_heuristic(start_node));
     while (!open->is_empty()) {
-        auto[best_node, g] = open->get_best_node();
+        auto[best_node, g, _] = open->get_best_node();
         closed->add_node(best_node);
         if (best_node == goal_node) {
             return SearchResult{path_to_alignment(sequences, get_path(&best_node)),

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "progressive_alignment.h"
 #include "astar.h"
+#include "peastar.h"
 #include "anytime_astar.h"
 #include "idastar.h"
 #include <cassert>
@@ -87,6 +88,14 @@ void test_AStar() {
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
 }
 
+void test_PEAStar() {
+    SearchResult result = PEAStar(test_sequences1, test_matrix1, 0);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix1), 36);
+
+    result = PEAStar(test_sequences2, test_matrix2, 20);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+}
+
 void test_AnytimeAStar() {
     SearchResult result = AnytimeAStar(test_sequences1, test_matrix1, 10);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix1), 36);
@@ -124,11 +133,14 @@ void test_same_aligment_scores() {
     for (int iter = 0; iter < 50; iter++) {
         auto[seqs, m] = gen_simple_test();
         SearchResult astar = AStar(seqs, m);
+        SearchResult peastar = PEAStar(seqs, m, 10);
         SearchResult anytime_astar = AnytimeAStar(seqs, m, rand() % 10 + 1);
         SearchResult idastar = IDAStar(seqs, m);
         int astar_score = calculate_alignment_score(astar.alignment, m);
+        int peastar_score = calculate_alignment_score(peastar.alignment, m);
         int anytime_astar_score = calculate_alignment_score(anytime_astar.alignment, m);
         int idastar_score = calculate_alignment_score(idastar.alignment, m);
+        assert_eq(astar_score, peastar_score);
         assert_eq(astar_score, anytime_astar_score);
         assert_eq(astar_score, idastar_score);
     }
@@ -141,6 +153,7 @@ int main() {
     test_calculate_alignment_score();
     test_progressive_alignment();
     test_AStar();
+    test_PEAStar();
     test_AnytimeAStar();
     test_IDAStar();
     test_same_aligment_scores();

@@ -11,7 +11,7 @@ std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment);
 
 class Open {
 public:
-    virtual std::pair<Node, int> get_best_node() = 0;
+    virtual std::tuple<Node, int, int> get_best_node() = 0;
 
     virtual std::vector<Node> get_nodes() = 0;
 

@@ -4,7 +4,8 @@ project(msa-heuristic-search)
 set(CMAKE_CXX_STANDARD 17)
 
 
-add_library(msa STATIC src/node.cpp src/heuristic.cpp src/progressive_alignment.cpp src/common.cpp src/astar.cpp include/anytime_astar.h src/anytime_astar.cpp include/idastar.h src/idastar.cpp)
+add_library(msa STATIC src/node.cpp src/heuristic.cpp src/progressive_alignment.cpp
+        src/common.cpp src/astar.cpp src/anytime_astar.cpp src/idastar.cpp src/peastar.cpp)
 target_include_directories(msa PUBLIC include)
 
 add_executable(msa_main main.cpp)

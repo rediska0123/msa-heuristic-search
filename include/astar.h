@@ -12,7 +12,7 @@ class OpenAStar : public Open {
 public:
     explicit OpenAStar(std::shared_ptr<Closed> closed) : _closed(std::move(closed)) {};
 
-    std::pair<Node, int> get_best_node() override;
+    std::tuple<Node, int, int> get_best_node() override;
 
     void add_node(const Node &node, int g, int f);
 
