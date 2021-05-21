@@ -16,6 +16,7 @@ private:
 };
 
 struct AnytimeAStarSearchResult: public SearchResult {
+    AnytimeAStarSearchResult() = default;
     AnytimeAStarSearchResult(const AlignmentOutput &a, const AnytimeProgressTracker &tracker);
 
     std::pair<int, int> bounds;

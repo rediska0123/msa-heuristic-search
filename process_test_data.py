@@ -59,6 +59,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
+    all_files = []
     for root, dirs, files in os.walk(args.balibase_dir):
         if len(files) == 0:
             continue
@@ -70,4 +71,7 @@ if __name__ == '__main__':
             if sequences_num > args.max_sequences_num:
                 continue
             save_to_file(alignment_data, os.path.join(args.output_dir, file_prefix + '.txt'))
+            all_files.append(file_prefix + '.txt')
+    with open('data/sequences/all_files.txt', 'w') as f:
+        print(' '.join(all_files), file=f)
 

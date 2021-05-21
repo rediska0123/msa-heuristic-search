@@ -77,6 +77,7 @@ protected:
 };
 
 struct SearchResult {
+    SearchResult() = default;
     SearchResult(const AlignmentOutput &a, const ProgressTracker &tracker);
     AlignmentOutput alignment;
     int max_nodes_in_memory;
