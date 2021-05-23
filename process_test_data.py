@@ -63,6 +63,7 @@ if __name__ == '__main__':
     for root, dirs, files in os.walk(args.balibase_dir):
         if len(files) == 0:
             continue
+        files = list(filter(lambda s: s.startswith('BB'), files))
         file_prefixes = list(set([f.split('.')[0] for f in files]))
         file_prefixes.sort()
         for file_prefix in file_prefixes:
