@@ -14,7 +14,7 @@ int search(IDAStarProgressTracker &tracker, const Sequences &seqs, const ScoreMa
     if (n == goal_node)
         return -INF;
     int min_bound = INF;
-    for (const Node &nxt: n.get_successors(seqs)) {
+    for (const Node &nxt: n.get_successors(seqs, nullptr)) {
         // the graph is acyclic, so no need to check whether nxt is in path
         path.push_back(nxt);
         int c = n.compute_cost(nxt, seqs, mtx);

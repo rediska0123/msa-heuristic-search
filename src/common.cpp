@@ -24,6 +24,7 @@ void Open::add_node(const Node &node, int g, int f) {
     if (_g_values.find(node) == _g_values.end() || _g_values[node] >= g) {
         _nodes.push({f, node});
         _g_values[node] = g;
+        _storage->add_node(node);
     }
 }
 
@@ -66,6 +67,7 @@ int Closed::g_value(const Node &node) {
 
 void Closed::add_node(const Node &node, int g) {
     _g_values[node] = g;
+    _storage->add_node(node);
 }
 
 std::vector<Node> Closed::get_nodes() {
@@ -77,6 +79,29 @@ std::vector<Node> Closed::get_nodes() {
 
 size_t Closed::size() const {
     return _g_values.size();
+}
+
+void NodeStorage::add_node(const Node &node) {
+    if (_nodes.find(node) != _nodes.end()) {
+        *_nodes.at(node) = node;
+    } else {
+        _nodes.insert({node, new Node(node)});
+    }
+}
+
+Node* NodeStorage::get_node_ptr(const Node &node) const {
+    return _nodes.at(node);
+}
+
+NodeStorage::~NodeStorage() {
+    clear();
+}
+
+void NodeStorage::clear() {
+    for(auto [_, ptr]: _nodes) {
+        delete ptr;
+    }
+    _nodes.clear();
 }
 
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx) {

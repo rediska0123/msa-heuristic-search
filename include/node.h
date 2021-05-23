@@ -8,7 +8,6 @@
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
-#include <memory>
 
 class Node;
 
@@ -16,14 +15,13 @@ class NodeHashFunction;
 
 class Node {
 public:
-    explicit Node(std::vector<int> indices) : _indices(std::move(indices)), _parent(std::shared_ptr<Node>(nullptr)) {}
+    explicit Node(std::vector<int> indices) : _indices(std::move(indices)), _parent(nullptr) {}
 
-    Node(std::vector<int> indices, std::shared_ptr<const Node> parent) : _indices(std::move(indices)),
-                                                                         _parent(std::move(parent)) {}
+    Node(std::vector<int> indices, Node *parent) : _indices(std::move(indices)), _parent(parent) {}
 
-    void set_parent(std::shared_ptr<const Node> parent) { _parent = std::move(parent); }
+    void set_parent(Node *parent) { _parent = parent; }
 
-    std::unordered_set<Node, NodeHashFunction> get_successors(const Sequences &sequences) const;
+    std::unordered_set<Node, NodeHashFunction> get_successors(const Sequences &sequences, Node *ptr) const;
 
     int compute_cost(const Node &other, const Sequences &sequences, const ScoreMatrix &mtx) const;
 
@@ -41,7 +39,7 @@ public:
 
 private:
     std::vector<int> _indices;
-    std::shared_ptr<const Node> _parent;
+    Node *_parent;
 };
 
 class NodeHashFunction {

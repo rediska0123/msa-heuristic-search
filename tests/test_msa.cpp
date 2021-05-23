@@ -49,13 +49,13 @@ void test_compute_cost() {
 }
 
 void test_get_successors() {
-    assert(Node({0, 0, 1}).get_successors(test_sequences1) ==
+    assert(Node({0, 0, 1}).get_successors(test_sequences1, nullptr) ==
            (std::unordered_set<Node, NodeHashFunction>{Node({0, 0, 2}), Node({0, 1, 1}), Node({0, 1, 2}),
                                                        Node({1, 0, 1}), Node({1, 0, 2}), Node({1, 1, 1}),
                                                        Node({1, 1, 2})}));
-    assert(Node({2, 2, 3}).get_successors(test_sequences1) ==
+    assert(Node({2, 2, 3}).get_successors(test_sequences1, nullptr) ==
            (std::unordered_set<Node, NodeHashFunction>{Node({2, 3, 3}), Node({3, 2, 3}), Node({3, 3, 3})}));
-    assert(Node({4, 3, 3}).get_successors(test_sequences1).empty());
+    assert(Node({4, 3, 3}).get_successors(test_sequences1, nullptr).empty());
 }
 
 void test_calculate_heuristic() {

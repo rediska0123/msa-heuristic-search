@@ -3,7 +3,7 @@
 
 #include "input.h"
 #include "node.h"
-#include <memory>
+#include <unordered_map>
 
 typedef std::vector<Sequence> AlignmentOutput;
 
@@ -13,9 +13,11 @@ class Open;
 
 class Closed;
 
+class NodeStorage;
+
 class Open {
 public:
-    explicit Open(std::shared_ptr<Closed> closed) : _closed(std::move(closed)) {};
+    Open(Closed *closed, NodeStorage *storage) : _closed(closed), _storage(storage) {};
 
     std::tuple<Node, int, int> get_best_node();
 
@@ -37,7 +39,8 @@ private:
         }
     };
 
-    std::shared_ptr<Closed> _closed;
+    Closed *_closed;
+    NodeStorage *_storage;
     std::priority_queue<std::pair<int, Node>, std::vector<std::pair<int, Node>>, Comparator> _nodes;
     std::unordered_map<Node, int, NodeHashFunction> _g_values;
 
@@ -46,6 +49,8 @@ private:
 
 class Closed {
 public:
+    Closed(NodeStorage *storage) : _storage(storage) {};
+
     void add_node(const Node &node, int g);
 
     void delete_node(const Node &node);
@@ -59,7 +64,21 @@ public:
     size_t size() const;
 
 private:
+    NodeStorage *_storage;
     std::unordered_map<Node, int, NodeHashFunction> _g_values;
+};
+
+class NodeStorage {
+public:
+    ~NodeStorage();
+
+    void add_node(const Node &node);
+
+    Node* get_node_ptr(const Node &node) const;
+
+    void clear();
+private:
+    std::unordered_map<Node, Node *, NodeHashFunction> _nodes;
 };
 
 class ProgressTracker {
@@ -71,6 +90,7 @@ public:
     int get_max_nodes_in_memory() const;
 
     int get_iterations_num() const;
+
 protected:
     int _max_nodes_in_memory;
     int _iterations_num;
@@ -78,7 +98,9 @@ protected:
 
 struct SearchResult {
     SearchResult() = default;
+
     SearchResult(const AlignmentOutput &a, const ProgressTracker &tracker);
+
     AlignmentOutput alignment;
     int max_nodes_in_memory;
     int iterations_num;

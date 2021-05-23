@@ -3,8 +3,7 @@
 #include <unordered_set>
 #include <algorithm>
 
-std::unordered_set<Node, NodeHashFunction> Node::get_successors(const Sequences &sequences) const {
-    std::shared_ptr<Node> parent = std::make_shared<Node>(*this);
+std::unordered_set<Node, NodeHashFunction> Node::get_successors(const Sequences &sequences, Node *ptr) const {
     unsigned int mask = ~0;
     for (int i = 0; i < _indices.size(); ++i) {
         if (_indices[i] == sequences[i].size()) {
@@ -25,7 +24,7 @@ std::unordered_set<Node, NodeHashFunction> Node::get_successors(const Sequences 
         for (int i = 0; i < _indices.size(); ++i) {
             indices[i] += (edge & (1 << i)) >> i;
         }
-        successors.insert(Node(std::move(indices), std::shared_ptr<Node>(parent)));
+        successors.insert(Node(std::move(indices), ptr));
     }
     return successors;
 }
@@ -77,5 +76,5 @@ size_t Node::size() const {
 }
 
 const Node *Node::get_parent() const {
-    return _parent.get();
+    return _parent;
 }
