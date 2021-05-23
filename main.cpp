@@ -1,9 +1,10 @@
+#pragma GCC optimize("Ofast,no-stack-protector,unroll-all-loops,unroll-loops")
+#pragma GCC target("abm,mmx,sse,sse2,sse3,ssse3,sse4a,popcnt,tune=native")
+
 #include <iostream>
 #include <fstream>
 #include <chrono>
-#include "node.h"
 #include "input.h"
-#include "heuristic.h"
 #include "common.h"
 #include "progressive_alignment.h"
 #include "anytime_astar.h"
