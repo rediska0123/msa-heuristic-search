@@ -29,19 +29,19 @@ struct TestOutput {
     Test test;
 
     AlignmentOutput progressive_alignment_result;
-    double avg_progressive_alignment_runtime_sec;
+    double avg_progressive_alignment_runtime_ms;
 
     SearchResult astar_result;
-    double avg_astar_result_runtime_sec;
+    double avg_astar_result_runtime_ms;
 
     SearchResult idastar_result;
-    double avg_idastar_runtime_sec;
+    double avg_idastar_runtime_ms;
 
     vector<SearchResult> peastar_result; // for different C values
-    vector<double> avg_peastar_runtime_sec;
+    vector<double> avg_peastar_runtime_ms;
 
     vector<AnytimeAStarSearchResult> anytime_astar_result; // for different W values
-    vector<double> avg_anytime_astar_runtime_sec;
+    vector<double> avg_anytime_astar_runtime_ms;
 };
 
 vector<Test> load_tests() {
@@ -80,7 +80,7 @@ auto start_##algo_name = chrono::system_clock::now(); \
 for (int i = 0; i < (run_times); i++) \
     algo_name##_output = run_command; \
 double avg_##algo_name##_run_time = \
-    (double)std::chrono::duration_cast<std::chrono::seconds>(chrono::system_clock::now() - start_##algo_name).count() /\
+    (double)std::chrono::duration_cast<std::chrono::microseconds>(chrono::system_clock::now() - start_##algo_name).count() /\
             ((double)run_times);
 
 
@@ -136,16 +136,16 @@ vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int ru
 void save_results(const vector<TestOutput> &outputs) {
     cout << "Saving results..." << endl;
     ofstream f("results.csv");
-    f << "Test,Graph size,Matrix,Sequences number,Maximum sequence len,PA score,PA runtime (sec),"
-      << "A* score,A* memory,A* iterations,A* runtime (sec),"
-      << "IDA* score,IDA* memory,IDA* iterations,IDA* runtime (sec),";
+    f << "Test,Graph size,Matrix,Sequences number,Maximum sequence len,PA score,PA runtime (micros),"
+      << "A* score,A* memory,A* iterations,A* runtime (micros),"
+      << "IDA* score,IDA* memory,IDA* iterations,IDA* runtime (micros),";
     for (int c : c_for_peastar) {
         const string name = "PEA*(c=" + to_string(c) + ")";
-        f << name << " score," << name << " memory," << name << " iterations," << name << " runtime (sec),";
+        f << name << " score," << name << " memory," << name << " iterations," << name << " runtime (micros),";
     }
     for (double w : w_for_anytime_astar) {
         const string name = "AnytimeA*(w=" + to_string(w) + ")";
-        f << name << " score," << name << " memory," << name << " iterations," << name << " runtime (sec),"
+        f << name << " score," << name << " memory," << name << " iterations," << name << " runtime (micros),"
           << name << " min bounds," << name << " max bounds,";
     }
     f << "Real alignment score\n";
@@ -155,21 +155,21 @@ void save_results(const vector<TestOutput> &outputs) {
           << outp.test.matrix_name << "," << (int)outp.test.sequences.size() << ","
           << max_sequence_len(outp.test.sequences) << ","
           << calculate_alignment_score(outp.progressive_alignment_result, outp.test.mtx) << ","
-          << outp.avg_progressive_alignment_runtime_sec << ",";
+          << outp.avg_progressive_alignment_runtime_ms << ",";
         f << calculate_alignment_score(outp.astar_result.alignment, outp.test.mtx) << ","
           << outp.astar_result.max_nodes_in_memory << "," << outp.astar_result.iterations_num << ","
-          << outp.avg_astar_result_runtime_sec << ",";
+          << outp.avg_astar_result_runtime_ms << ",";
         f << calculate_alignment_score(outp.idastar_result.alignment, outp.test.mtx) << ","
           << outp.idastar_result.max_nodes_in_memory << "," << outp.idastar_result.iterations_num << ","
-          << outp.avg_idastar_runtime_sec << ",";
+          << outp.avg_idastar_runtime_ms << ",";
         for (int i = 0; i < (int)c_for_peastar.size(); i++)
             f << calculate_alignment_score(outp.peastar_result[i].alignment, outp.test.mtx) << ","
               << outp.peastar_result[i].max_nodes_in_memory << "," << outp.peastar_result[i].iterations_num << ","
-              << outp.avg_peastar_runtime_sec[i] << ",";
+              << outp.avg_peastar_runtime_ms[i] << ",";
         for (int i = 0; i < (int)w_for_anytime_astar.size(); i++) {
             f << calculate_alignment_score(outp.anytime_astar_result[i].alignment, outp.test.mtx) << ","
               << outp.anytime_astar_result[i].max_nodes_in_memory << "," << outp.anytime_astar_result[i].iterations_num << ","
-              << outp.avg_anytime_astar_runtime_sec[i] << ",";
+              << outp.avg_anytime_astar_runtime_ms[i] << ",";
             for (const auto & bound : outp.anytime_astar_result[i].bounds)
                 f << bound.first << " ";
             f << ",";
