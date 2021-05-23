@@ -16,7 +16,8 @@ SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
     open.add_node(start_node, 0, hc.calculate_heuristic(start_node));
     ProgressTracker tracker;
     while (!open.is_empty()) {
-        tracker.on_new_iteration(open, closed);
+        if (tracker.on_new_iteration(open, closed))
+            return SearchResult(AlignmentOutput(), tracker);
         auto[best_node, g, _] = open.get_best_node();
         closed.add_node(best_node, g);
         if (best_node == goal_node) {

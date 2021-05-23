@@ -47,15 +47,16 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
                 st.update_f_value(nxt, g + c + h);
             }
         }
-        tracker.on_new_iteration(open, closed, st.get_min_f_value(), f_incumbent);
+        if (tracker.on_new_iteration(open, closed, st.get_min_f_value(), f_incumbent))
+            return AnytimeAStarSearchResult(path_to_alignment(sequences, get_path(&incumbent)), tracker);
     }
 
     return AnytimeAStarSearchResult(path_to_alignment(sequences, get_path(&incumbent)), tracker);
 }
 
-void AnytimeProgressTracker::on_new_iteration(const Open &open, const Closed &closed, int min_bound, int max_bound) {
-    ProgressTracker::on_new_iteration(open, closed);
+bool AnytimeProgressTracker::on_new_iteration(const Open &open, const Closed &closed, int min_bound, int max_bound) {
     _bounds.emplace_back(min_bound, max_bound);
+    return ProgressTracker::on_new_iteration(open, closed);
 }
 
 std::vector<std::pair<int, int>> AnytimeProgressTracker::get_bounds() const {

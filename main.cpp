@@ -41,7 +41,8 @@ struct TestOutput {
     unordered_map<int, double> avg_anytime_astar_runtime_sec;
 };
 
-vector<Test> generate_tests() {
+vector<Test> load_tests() {
+    cout << "Loading tests..." << endl;
     vector<string> all_files;
     ifstream f("data/sequences/all_files.txt");
     string filename;
@@ -68,16 +69,19 @@ int max_sequence_len(const Sequences &seqs) {
 auto start_##algo_name = chrono::system_clock::now(); \
 for (int i = 0; i < (run_times); i++) \
     algo_name##_output = run_command; \
-double avg_##algo_name##_run_time = (double)(chrono::system_clock::now() - start_##algo_name).count() / (1000000 * run_times);
+double avg_##algo_name##_run_time = \
+    (double)std::chrono::duration_cast<std::chrono::seconds>(chrono::system_clock::now() - start_##algo_name).count() /\
+            (run_times);
 
 
 vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int run_times = 1,
                                                     const vector<int> &c_for_peastar = {10}, // TODO
                                                     const vector<int> &w_for_anytime_astar = {90}) { // TODO
+    cout << "Running algorithms..." << endl;
     vector<TestOutput> outputs;
     for (int i = 0; i < (int)tests.size(); i++) {
         const Test &test = tests[i];
-        cout << "Test " << i << "/" << (int)tests.size() << " " << test.test_name << ": " << (int)test.alignment.size() <<
+        cout << "Test " << i + 1 << "/" << (int)tests.size() << " " << test.test_name << ": " << (int)test.alignment.size() <<
                 " sequences, max len = " << max_sequence_len(tests[i].sequences) << endl;
         AlignmentOutput progressive_alignment_output;
         cout << " Running progressive alignment..." << endl;
@@ -122,8 +126,9 @@ vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int ru
 }
 
 void save_results(const vector<TestOutput> &outputs) {
+    cout << "Saving results..." << endl;
     ofstream f("results.csv");
-    f << "Test,Matrix,PA score,PA runtime (sec),"
+    f << "Test,Matrix,Sequences number,Maximum sequence len,PA score,PA runtime (sec),"
       << "A* score,A* memory,A* iterations,A* runtime (sec),"
       << "IDA* score,IDA* memory,IDA* iterations,IDA* runtime (sec),";
     for (const pair<const int, SearchResult>& res : outputs[0].peastar_result) {
@@ -138,7 +143,8 @@ void save_results(const vector<TestOutput> &outputs) {
     f << "Real alignment score\n";
 
     for (const TestOutput &outp : outputs) {
-        f << outp.test.test_name << "," << outp.test.matrix_name << ","
+        f << outp.test.test_name << "," << outp.test.matrix_name << "," << (int)outp.test.sequences.size() << ","
+          << max_sequence_len(outp.test.sequences) << ","
           << calculate_alignment_score(outp.progressive_alignment_result, outp.test.mtx) << ","
           << outp.avg_progressive_alignment_runtime_sec << ",";
         f << calculate_alignment_score(outp.astar_result.alignment, outp.test.mtx) << ","
@@ -167,8 +173,7 @@ void save_results(const vector<TestOutput> &outputs) {
 }
 
 int main() {
-    cout << "Generate tests..." << endl;
-    vector<Test> tests = generate_tests();
+    vector<Test> tests = load_tests();
     vector<TestOutput> outputs = generate_algorithms_results(tests);
     save_results(outputs);
 

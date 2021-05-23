@@ -1,12 +1,38 @@
 import argparse
 import os
 
+SMALL_SEQUENCE_LEN = 10
+MEDIUM_SEQUENCE_LEN = 15
+LARGE_SEQUENCE_LEN = 20
+
+SMALL_TESTS_FREQ = 0.5
+MEDIUM_TESTS_FREQ = 0.3
+LARGE_TEST_FREQ = 0.2
+
+MAX_SEQUENCES_NUM = 6
+
 
 class AlignmentData:
     def __init__(self, file_prefix, sequences, alignment):
         self.file_prefix = file_prefix
         self.sequences = sequences
         self.alignment = alignment
+
+
+def resize_test(alignment_data, size):
+    b = -1
+    for j in range(len(alignment_data.alignment[0]) - size + 1):
+        sol = True
+        for a in alignment_data.alignment:
+            if all(c == '-' for c in a[j : size + j]):
+                sol = False
+        if sol:
+            b = j
+            break
+    assert b != -1
+    alignment_data.alignment = [a[b:size + b] for a in alignment_data.alignment]
+    alignment_data.sequences = [''.join([c for c in a if c != '-']) for a in alignment_data.alignment]
+    return alignment_data
 
 
 def parse_sequences(file_name):
@@ -49,9 +75,6 @@ if __name__ == '__main__':
                         help='Directory with Balibase3 data. Can be downloaded here:'
                              'https://www.lbgi.fr/balibase/BalibaseDownload/BAliBASE_R1-5.tar.gz',
                         default='bb3_release')
-    parser.add_argument('--max_sequences_num',
-                        help='Maximum number of sequences to align.',
-                        default=15)
     parser.add_argument('--output_dir',
                         help='Directory to score processed data.',
                         default='data/sequences')
@@ -59,7 +82,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
-    all_files = []
+    data = []
     for root, dirs, files in os.walk(args.balibase_dir):
         if len(files) == 0:
             continue
@@ -68,11 +91,19 @@ if __name__ == '__main__':
         file_prefixes.sort()
         for file_prefix in file_prefixes:
             alignment_data = parse_file(root, file_prefix)
-            sequences_num = len(alignment_data.sequences)
-            if sequences_num > args.max_sequences_num:
+            if len(alignment_data.sequences) > MAX_SEQUENCES_NUM:
                 continue
-            save_to_file(alignment_data, os.path.join(args.output_dir, file_prefix + '.txt'))
-            all_files.append(file_prefix + '.txt')
+            data.append(alignment_data)
+
+    for i in range(len(data)):
+        if i < SMALL_TESTS_FREQ * len(data):
+            data[i] = resize_test(data[i], SMALL_SEQUENCE_LEN)
+        elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ) * len(data):
+            data[i] = resize_test(data[i], MEDIUM_SEQUENCE_LEN)
+        else:
+            data[i] = resize_test(data[i], LARGE_SEQUENCE_LEN)
+        save_to_file(data[i], os.path.join(args.output_dir, data[i].file_prefix + '.txt'))
+
     with open('data/sequences/all_files.txt', 'w') as f:
-        print(' '.join(all_files), file=f)
+        print(' '.join([d.file_prefix + '.txt' for d in data]), file=f)
 

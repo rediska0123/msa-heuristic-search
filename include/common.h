@@ -4,6 +4,7 @@
 #include "input.h"
 #include "node.h"
 #include <unordered_map>
+#include <chrono>
 
 typedef std::vector<Sequence> AlignmentOutput;
 
@@ -83,17 +84,23 @@ private:
 
 class ProgressTracker {
 public:
-    ProgressTracker(): _max_nodes_in_memory(0), _iterations_num(0) {};
+    explicit ProgressTracker(int max_runtime_secs = 60):
+        _max_nodes_in_memory(0), _iterations_num(0), _max_runtime_secs(max_runtime_secs),
+        _start_time(std::chrono::system_clock::now()) {};
 
-    void on_new_iteration(const Open &open, const Closed &closed);
+    bool on_new_iteration(const Open &open, const Closed &closed);
 
     int get_max_nodes_in_memory() const;
 
     int get_iterations_num() const;
 
+    bool need_stop() const;
+
 protected:
     int _max_nodes_in_memory;
     int _iterations_num;
+    int _max_runtime_secs;
+    std::chrono::system_clock::time_point _start_time;
 };
 
 struct SearchResult {

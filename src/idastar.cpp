@@ -7,6 +7,8 @@
 int search(IDAStarProgressTracker &tracker, const Sequences &seqs, const ScoreMatrix &mtx,
            const HeuristicCalculator &hc, const Node &goal_node, std::vector<Node> &path, int g, int bound) {
     tracker.on_new_iteration(path);
+    if (tracker.need_stop())
+        return -INF;
     Node n = path.back();
     int f = g + hc.calculate_heuristic(n);
     if (f > bound)
@@ -36,6 +38,8 @@ SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx) {
     IDAStarProgressTracker tracker;
     while (true) {
         bound = search(tracker, sequences, mtx, hc, goal_node, path, 0, bound);
+        if (tracker.need_stop())
+            return SearchResult(AlignmentOutput(), tracker);
         assert(bound != INF);
         if (bound == -INF)
             return SearchResult(path_to_alignment(sequences, path), tracker);

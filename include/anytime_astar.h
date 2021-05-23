@@ -8,9 +8,9 @@
 
 class AnytimeProgressTracker: public ProgressTracker {
 public:
-    AnytimeProgressTracker(): ProgressTracker(), _bounds({}) {}
+    explicit AnytimeProgressTracker(int max_runtime_secs = 60): ProgressTracker(max_runtime_secs), _bounds({}) {}
 
-    void on_new_iteration(const Open &open, const Closed &closed, int min_bound, int max_bound);
+    bool on_new_iteration(const Open &open, const Closed &closed, int min_bound, int max_bound);
 
     std::vector<std::pair<int, int>> get_bounds() const;
 private:

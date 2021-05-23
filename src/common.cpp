@@ -106,6 +106,8 @@ void NodeStorage::clear() {
 
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx) {
     int score = 0;
+    if (alignment.empty())
+        return 0;
     for (int pos = 0; pos < (int) alignment[0].size(); pos++)
         for (int i = 0; i < (int) alignment.size(); i++)
             for (int j = 0; j < i; j++)
@@ -184,9 +186,17 @@ ScoreMatrix parse_matrix_file(const std::string &filepath) {
     return m;
 }
 
-void ProgressTracker::on_new_iteration(const Open &open, const Closed &closed) {
+bool ProgressTracker::on_new_iteration(const Open &open, const Closed &closed) {
     _max_nodes_in_memory = std::max(_max_nodes_in_memory, (int)open.size() + (int)closed.size());
     _iterations_num += 1;
+    return need_stop();
+}
+
+bool ProgressTracker::need_stop() const {
+    bool stop = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - _start_time).count() > _max_runtime_secs;
+    if (stop)
+        std::cerr << "Interrupted, timeout reached (" << _max_runtime_secs << "s)" << std::endl;
+    return stop;
 }
 
 int ProgressTracker::get_max_nodes_in_memory() const {
