@@ -134,7 +134,7 @@ void test_same_aligment_scores() {
         auto[seqs, m] = gen_simple_test();
         SearchResult astar = AStar(seqs, m);
         SearchResult peastar = PEAStar(seqs, m, 10);
-        SearchResult anytime_astar = AnytimeAStar(seqs, m, rand() % 10 + 1);
+        SearchResult anytime_astar = AnytimeAStar(seqs, m, double(rand() % 10 + 1));
         SearchResult idastar = IDAStar(seqs, m);
         int astar_score = calculate_alignment_score(astar.alignment, m);
         int peastar_score = calculate_alignment_score(peastar.alignment, m);

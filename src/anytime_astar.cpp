@@ -1,14 +1,13 @@
 #include <algorithm>
 #include <cassert>
 #include <anytime_astar.h>
-#include <set>
 
 #include "heuristic.h"
 #include "utils.h"
 #include "common.h"
 
-AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, int w) {
-    assert(w >= 1);
+AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, double w) {
+    assert(w >= 1.0);
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
     NodeStorage storage;
@@ -18,7 +17,7 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
 
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
-    open.add_node(start_node, 0, w * hc.calculate_heuristic(start_node));
+    open.add_node(start_node, 0, int(w * hc.calculate_heuristic(start_node)));
     Node incumbent({});
     int f_incumbent = INF;
 
@@ -43,7 +42,7 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
                     continue;
                 if (closed.was_expanded(nxt))
                     closed.delete_node(nxt);
-                open.add_node(nxt, g + c, g + c + w * h);
+                open.add_node(nxt, g + c, int(w * h + g + c));
                 st.update_f_value(nxt, g + c + h);
             }
         }

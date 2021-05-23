@@ -14,6 +14,9 @@
 
 using namespace std;
 
+const vector<int> c_for_peastar = {10, 40, 70};
+const vector<double> w_for_anytime_astar = {100.0 / 99.0, 1.1, 1.5};
+
 struct Test {
     string test_name;
     string matrix_name;
@@ -34,11 +37,11 @@ struct TestOutput {
     SearchResult idastar_result;
     double avg_idastar_runtime_sec;
 
-    unordered_map<int, SearchResult> peastar_result; // for different C values
-    unordered_map<int, double> avg_peastar_runtime_sec;
+    vector<SearchResult> peastar_result; // for different C values
+    vector<double> avg_peastar_runtime_sec;
 
-    unordered_map<int, AnytimeAStarSearchResult> anytime_astar_result; // for different W values
-    unordered_map<int, double> avg_anytime_astar_runtime_sec;
+    vector<AnytimeAStarSearchResult> anytime_astar_result; // for different W values
+    vector<double> avg_anytime_astar_runtime_sec;
 };
 
 vector<Test> load_tests() {
@@ -65,18 +68,23 @@ int max_sequence_len(const Sequences &seqs) {
     return max_len;
 }
 
+long long graph_size(const Sequences &seqs) {
+    long long res = 1;
+    for (const Sequence &seq : seqs)
+        res *= (long long)seq.size();
+    return res;
+}
+
 #define RUN_N_TIMES(run_times, algo_name, run_command) \
 auto start_##algo_name = chrono::system_clock::now(); \
 for (int i = 0; i < (run_times); i++) \
     algo_name##_output = run_command; \
 double avg_##algo_name##_run_time = \
     (double)std::chrono::duration_cast<std::chrono::seconds>(chrono::system_clock::now() - start_##algo_name).count() /\
-            (run_times);
+            ((double)run_times);
 
 
-vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int run_times = 1,
-                                                    const vector<int> &c_for_peastar = {10}, // TODO
-                                                    const vector<int> &w_for_anytime_astar = {90}) { // TODO
+vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int run_times = 1) {
     cout << "Running algorithms..." << endl;
     vector<TestOutput> outputs;
     for (int i = 0; i < (int)tests.size(); i++) {
@@ -95,24 +103,24 @@ vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int ru
         cout << " Running IDAStar..." << endl;
         RUN_N_TIMES(run_times, idastar, IDAStar(test.sequences, test.mtx));
 
-        unordered_map<int, SearchResult> peastar_outputs;
-        unordered_map<int, double> avg_peastar_run_times;
+        vector<SearchResult> peastar_outputs;
+        vector<double> avg_peastar_run_times;
         for (int c : c_for_peastar) {
             cout << " Running PEAStar(c=" << c << ")..." << endl;
             SearchResult peastar_output;
             RUN_N_TIMES(run_times, peastar, PEAStar(test.sequences, test.mtx, c));
-            avg_peastar_run_times[c] = avg_peastar_run_time;
-            peastar_outputs[c] = peastar_output;
+            avg_peastar_run_times.push_back(avg_peastar_run_time);
+            peastar_outputs.push_back(peastar_output);
         }
 
-        unordered_map<int, AnytimeAStarSearchResult> anytime_astar_outputs;
-        unordered_map<int, double> avg_anytime_astar_run_times;
-        for (int w : w_for_anytime_astar) {
+        vector<AnytimeAStarSearchResult> anytime_astar_outputs;
+        vector<double> avg_anytime_astar_run_times;
+        for (double w : w_for_anytime_astar) {
             cout << " Running AnytimeAStar(w=" << w << ")..." << endl;
             AnytimeAStarSearchResult anytime_astar_output;
-            RUN_N_TIMES(run_times, anytime_astar, AnytimeAStar(test.sequences, test.mtx, w));
-            avg_anytime_astar_run_times[w] = avg_anytime_astar_run_time;
-            anytime_astar_outputs[w] = anytime_astar_output;
+            RUN_N_TIMES(run_times, anytime_astar, AnytimeAStar(test.sequences, test.mtx, w_for_anytime_astar[i]));
+            avg_anytime_astar_run_times.push_back(avg_anytime_astar_run_time);
+            anytime_astar_outputs.push_back(anytime_astar_output);
         }
 
         outputs.push_back(TestOutput{test,
@@ -128,22 +136,23 @@ vector<TestOutput> generate_algorithms_results(const vector<Test> &tests, int ru
 void save_results(const vector<TestOutput> &outputs) {
     cout << "Saving results..." << endl;
     ofstream f("results.csv");
-    f << "Test,Matrix,Sequences number,Maximum sequence len,PA score,PA runtime (sec),"
+    f << "Test,Graph size,Matrix,Sequences number,Maximum sequence len,PA score,PA runtime (sec),"
       << "A* score,A* memory,A* iterations,A* runtime (sec),"
       << "IDA* score,IDA* memory,IDA* iterations,IDA* runtime (sec),";
-    for (const pair<const int, SearchResult>& res : outputs[0].peastar_result) {
-        const string name = "PEA*(c=" + to_string(res.first) + ")";
+    for (int c : c_for_peastar) {
+        const string name = "PEA*(c=" + to_string(c) + ")";
         f << name << " score," << name << " memory," << name << " iterations," << name << " runtime (sec),";
     }
-    for (const pair<const int, AnytimeAStarSearchResult>& res : outputs[0].anytime_astar_result) {
-        const string name = "AnytimeA*(w=" + to_string(res.first) + ")";
+    for (double w : w_for_anytime_astar) {
+        const string name = "AnytimeA*(w=" + to_string(w) + ")";
         f << name << " score," << name << " memory," << name << " iterations," << name << " runtime (sec),"
           << name << " min bounds," << name << " max bounds,";
     }
     f << "Real alignment score\n";
 
     for (const TestOutput &outp : outputs) {
-        f << outp.test.test_name << "," << outp.test.matrix_name << "," << (int)outp.test.sequences.size() << ","
+        f << outp.test.test_name << "," << graph_size(outp.test.sequences) << ","
+          << outp.test.matrix_name << "," << (int)outp.test.sequences.size() << ","
           << max_sequence_len(outp.test.sequences) << ","
           << calculate_alignment_score(outp.progressive_alignment_result, outp.test.mtx) << ","
           << outp.avg_progressive_alignment_runtime_sec << ",";
@@ -153,18 +162,18 @@ void save_results(const vector<TestOutput> &outputs) {
         f << calculate_alignment_score(outp.idastar_result.alignment, outp.test.mtx) << ","
           << outp.idastar_result.max_nodes_in_memory << "," << outp.idastar_result.iterations_num << ","
           << outp.avg_idastar_runtime_sec << ",";
-        for (const pair<const int, SearchResult>& res : outp.peastar_result)
-            f << calculate_alignment_score(res.second.alignment, outp.test.mtx) << ","
-              << res.second.max_nodes_in_memory << "," << res.second.iterations_num << ","
-              << outp.avg_peastar_runtime_sec.at(res.first) << ",";
-        for (const pair<const int, AnytimeAStarSearchResult>& res : outp.anytime_astar_result) {
-            f << calculate_alignment_score(res.second.alignment, outp.test.mtx) << ","
-              << res.second.max_nodes_in_memory << "," << res.second.iterations_num << ","
-              << outp.avg_anytime_astar_runtime_sec.at(res.first) << ",";
-            for (const auto & bound : res.second.bounds)
+        for (int i = 0; i < (int)c_for_peastar.size(); i++)
+            f << calculate_alignment_score(outp.peastar_result[i].alignment, outp.test.mtx) << ","
+              << outp.peastar_result[i].max_nodes_in_memory << "," << outp.peastar_result[i].iterations_num << ","
+              << outp.avg_peastar_runtime_sec[i] << ",";
+        for (int i = 0; i < (int)w_for_anytime_astar.size(); i++) {
+            f << calculate_alignment_score(outp.anytime_astar_result[i].alignment, outp.test.mtx) << ","
+              << outp.anytime_astar_result[i].max_nodes_in_memory << "," << outp.anytime_astar_result[i].iterations_num << ","
+              << outp.avg_anytime_astar_runtime_sec[i] << ",";
+            for (const auto & bound : outp.anytime_astar_result[i].bounds)
                 f << bound.first << " ";
             f << ",";
-            for (const auto & bound : res.second.bounds)
+            for (const auto & bound : outp.anytime_astar_result[i].bounds)
                 f << bound.second << " ";
             f << ",";
         }
