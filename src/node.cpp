@@ -1,7 +1,16 @@
 #include "node.h"
+#include "utils.h"
 #include <iostream>
 #include <unordered_set>
 #include <algorithm>
+
+Node::Node(std::vector<int> indices) : _indices(std::move(indices)), _parent(nullptr) {
+    _hash = calculate_int_vector_hash(_indices);
+}
+
+Node::Node(std::vector<int> indices, Node *parent) : _indices(std::move(indices)), _parent(parent) {
+    _hash = calculate_int_vector_hash(_indices);
+}
 
 std::unordered_set<Node, NodeHashFunction> Node::get_successors(const Sequences &sequences, Node *ptr) const {
     unsigned int mask = ~0;
@@ -54,11 +63,7 @@ bool Node::operator==(const Node &other) const {
 }
 
 std::size_t NodeHashFunction::operator()(const Node &node) const {
-    std::size_t seed = node._indices.size();
-    for (int idx: node._indices) {
-        seed ^= idx + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    }
-    return seed;
+    return node._hash;
 }
 
 std::ostream &operator<<(std::ostream &o, const Node &node) {

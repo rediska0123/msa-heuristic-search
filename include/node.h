@@ -15,9 +15,9 @@ class NodeHashFunction;
 
 class Node {
 public:
-    explicit Node(std::vector<int> indices) : _indices(std::move(indices)), _parent(nullptr) {}
+    explicit Node(std::vector<int> indices);
 
-    Node(std::vector<int> indices, Node *parent) : _indices(std::move(indices)), _parent(parent) {}
+    Node(std::vector<int> indices, Node *parent);
 
     void set_parent(Node *parent) { _parent = parent; }
 
@@ -39,6 +39,7 @@ public:
 
 private:
     std::vector<int> _indices;
+    std::size_t _hash;
     Node *_parent;
 };
 
