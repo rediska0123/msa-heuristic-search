@@ -83,7 +83,7 @@ private:
 
 class ProgressTracker {
 public:
-    ProgressTracker() = default;
+    ProgressTracker(): _max_nodes_in_memory(0), _iterations_num(0) {};
 
     void on_new_iteration(const Open &open, const Closed &closed);
 

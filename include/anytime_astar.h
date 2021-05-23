@@ -1,6 +1,8 @@
 #ifndef MSA_HEURISTIC_SEARCH_ANYTIME_ASTAR_H
 #define MSA_HEURISTIC_SEARCH_ANYTIME_ASTAR_H
 
+#include <set>
+
 #include "input.h"
 #include "common.h"
 
@@ -13,6 +15,21 @@ public:
     std::vector<std::pair<int, int>> get_bounds() const;
 private:
     std::vector<std::pair<int, int>> _bounds;
+};
+
+class FValuesStorage {
+public:
+    FValuesStorage() = default;
+
+    void update_f_value(const Node &n, int new_f);
+
+    int get_f_value(const Node &n);
+
+    int get_min_f_value() const;
+
+private:
+    std::unordered_map<Node, int, NodeHashFunction> _f_value;
+    std::multiset<int> _f_values;
 };
 
 struct AnytimeAStarSearchResult: public SearchResult {
