@@ -19,7 +19,7 @@ struct AnytimeAStarSearchResult: public SearchResult {
     AnytimeAStarSearchResult() = default;
     AnytimeAStarSearchResult(const AlignmentOutput &a, const AnytimeProgressTracker &tracker);
 
-    std::pair<int, int> bounds;
+    std::vector<std::pair<int, int>> bounds;
 };
 
 AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, int w);

@@ -25,9 +25,9 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
     AnytimeProgressTracker tracker;
     while (!open->is_empty()) {
         auto[best_node, g, f] = open->get_best_node();
-        tracker.on_new_iteration(*open, *closed, f, f_incumbent);
         if (f_value[best_node] >= f_incumbent)
             continue;
+        tracker.on_new_iteration(*open, *closed, f, f_incumbent);
         closed->add_node(best_node, g);
         for (Node nxt: best_node.get_successors(sequences)) {
             int h = hc.calculate_heuristic(nxt), c = best_node.compute_cost(nxt, sequences, mtx);
@@ -63,5 +63,5 @@ std::vector<std::pair<int, int>> AnytimeProgressTracker::get_bounds() const {
 
 AnytimeAStarSearchResult::AnytimeAStarSearchResult(const AlignmentOutput &a, const AnytimeProgressTracker &tracker)
         : SearchResult(a, tracker) {
-    bounds = {};
+    bounds = tracker.get_bounds();
 }

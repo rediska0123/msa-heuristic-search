@@ -7,6 +7,7 @@ SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx);
 
 class IDAStarProgressTracker: public ProgressTracker {
 public:
+    IDAStarProgressTracker(): ProgressTracker() {}
     void on_new_iteration(const std::vector<Node> &path);
 };
 
