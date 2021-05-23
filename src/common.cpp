@@ -126,8 +126,10 @@ std::pair<Sequences, AlignmentOutput> parse_data_file(const std::string &filepat
     std::ifstream f(filepath);
     std::vector<Sequence> all_seqs;
     for (std::string line; getline(f, line);) {
-        std::vector<char> seq;
-        for (char c : line)
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line = line.substr(0, line.size() - 1);
+        std::vector<Symbol> seq;
+        for (Symbol c : line)
             seq.push_back(c);
         all_seqs.push_back(seq);
     }

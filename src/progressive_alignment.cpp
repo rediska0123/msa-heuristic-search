@@ -30,8 +30,13 @@ std::pair<SequencesWithIndexes, int> align_two_clusters(const SequencesWithIndex
                     continue;
                 int score = 0;
                 for (const SequenceWithIndex &s1 : c1)
-                    for (const SequenceWithIndex &s2 : c2)
+                    for (const SequenceWithIndex &s2 : c2) {
+                        Symbol c1_ = s1.seq[ni];
+                        Symbol c2_ = s2.seq[nj];
+                        auto m1 = mtx.at((d.first == 0) ? GAP : c1_);
+                        auto m2 = m1.at((d.second == 0) ? GAP : c2_);
                         score += mtx.at((d.first == 0) ? GAP : s1.seq[ni]).at((d.second == 0) ? GAP : s2.seq[nj]);
+                    }
                 if (min_score[i][j] > min_score[ni][nj] + score) {
                     min_score[i][j] = min_score[ni][nj] + score;
                     parent[i][j] = {ni, nj};

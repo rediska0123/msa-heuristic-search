@@ -115,13 +115,13 @@ std::vector<TestOutput> generate_algorithms_results(const std::vector<Test> &tes
                                      peastar_outputs, avg_peastar_run_times,
                                      anytime_astar_outputs, avg_anytime_astar_run_times});
     }
+    return outputs;
 }
 
 int main() {
     cout << "Generate tests..." << endl;
     std::vector<Test> tests = generate_tests();
     std::vector<TestOutput> outputs = generate_algorithms_results(tests);
-
     return 0;
 }
 

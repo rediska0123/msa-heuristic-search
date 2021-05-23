@@ -135,11 +135,11 @@ void test_same_aligment_scores() {
         SearchResult astar = AStar(seqs, m);
         SearchResult peastar = PEAStar(seqs, m, 10);
         SearchResult anytime_astar = AnytimeAStar(seqs, m, rand() % 10 + 1);
-        AlignmentOutput idastar_alignment = IDAStar(seqs, m);
+        SearchResult idastar = IDAStar(seqs, m);
         int astar_score = calculate_alignment_score(astar.alignment, m);
         int peastar_score = calculate_alignment_score(peastar.alignment, m);
         int anytime_astar_score = calculate_alignment_score(anytime_astar.alignment, m);
-        int idastar_score = calculate_alignment_score(idastar_alignment, m);
+        int idastar_score = calculate_alignment_score(idastar.alignment, m);
         assert_eq(astar_score, peastar_score);
         assert_eq(astar_score, anytime_astar_score);
         assert_eq(astar_score, idastar_score);
