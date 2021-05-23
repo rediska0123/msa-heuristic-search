@@ -1,5 +1,6 @@
-import argparse
 import os
+import tarfile
+from urllib import request
 
 SMALL_SEQUENCE_LEN = 10
 MEDIUM_SEQUENCE_LEN = 15
@@ -24,7 +25,7 @@ def resize_test(alignment_data, size):
     for j in range(len(alignment_data.alignment[0]) - size + 1):
         sol = True
         for a in alignment_data.alignment:
-            if all(c == '-' for c in a[j : size + j]):
+            if all(c == '-' for c in a[j: size + j]):
                 sol = False
         if sol:
             b = j
@@ -69,21 +70,20 @@ def save_to_file(alignment_data, save_file):
             print(aligned_seq, file=f)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process data from Balibase3 for heuristic multiple alignment.')
-    parser.add_argument('--balibase_dir',
-                        help='Directory with Balibase3 data. Can be downloaded here:'
-                             'https://www.lbgi.fr/balibase/BalibaseDownload/BAliBASE_R1-5.tar.gz',
-                        default='bb3_release')
-    parser.add_argument('--output_dir',
-                        help='Directory to score processed data.',
-                        default='data/sequences')
-    args = parser.parse_args()
+def download_data():
+    if os.path.exists('bb3_release'):
+        print(' Already downloaded.')
+        return
+    datastream = request.urlopen('http://www.lbgi.fr/balibase/BalibaseDownload/BAliBASE_R1-5.tar.gz')
+    thetarfile = tarfile.open(fileobj=datastream, mode="r|gz")
+    thetarfile.extractall()
 
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
+
+def process_data(output_dir='data/sequences', balibase_dir='bb3_release'):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     data = []
-    for root, dirs, files in os.walk(args.balibase_dir):
+    for root, dirs, files in os.walk(balibase_dir):
         if len(files) == 0:
             continue
         files = list(filter(lambda s: s.startswith('BB'), files))
@@ -102,8 +102,18 @@ if __name__ == '__main__':
             data[i] = resize_test(data[i], MEDIUM_SEQUENCE_LEN)
         else:
             data[i] = resize_test(data[i], LARGE_SEQUENCE_LEN)
-        save_to_file(data[i], os.path.join(args.output_dir, data[i].file_prefix + '.txt'))
+        save_to_file(data[i], os.path.join(output_dir, data[i].file_prefix + '.txt'))
 
     with open('data/sequences/all_files.txt', 'w') as f:
         print(' '.join([d.file_prefix + '.txt' for d in data]), file=f)
 
+
+def construct_dataset():
+    print('Downloading BALiBASE dataset...')
+    download_data()
+    print('Processing dataset...')
+    process_data()
+
+
+if __name__ == '__main__':
+    construct_dataset()
