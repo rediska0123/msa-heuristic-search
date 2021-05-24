@@ -70,7 +70,7 @@ AnytimeAStarSearchResult::AnytimeAStarSearchResult(const AlignmentOutput &a, con
 void FValuesStorage::update_f_value(const Node &n, int new_f) {
     if (_f_value.count(n) && _f_value[n] < new_f)
         return;
-    if (_f_values.count(_f_value[n]))
+    if (_f_value.count(n))
         _f_values.erase(_f_values.lower_bound(_f_value[n]));
     _f_value[n] = new_f;
     _f_values.insert(new_f);
