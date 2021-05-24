@@ -39,6 +39,6 @@ struct AnytimeAStarSearchResult: public SearchResult {
     std::vector<std::pair<int, int>> bounds;
 };
 
-AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, double w);
+AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, double w, int max_runtime_secs = 60);
 
 #endif //MSA_HEURISTIC_SEARCH_ANYTIME_ASTAR_H

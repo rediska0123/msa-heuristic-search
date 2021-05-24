@@ -1,16 +1,19 @@
 import os
 import tarfile
 from urllib import request
+import numpy as np
 
 SMALL_SEQUENCE_LEN = 10
-MEDIUM_SEQUENCE_LEN = 15
-LARGE_SEQUENCE_LEN = 20
+MEDIUM_SEQUENCE_LEN = 20
+LARGE_SEQUENCE_LEN = 40
+EXTRA_LARGE_SEQUENCE_LEN = np.inf
 
-SMALL_TESTS_FREQ = 0.5
+SMALL_TESTS_FREQ = 0.4
 MEDIUM_TESTS_FREQ = 0.3
 LARGE_TEST_FREQ = 0.2
+EXTRA_LARGE_TEST_FREQ = 0.1
 
-MAX_SEQUENCES_NUM = 6
+MAX_SEQUENCES_NUM = 10
 
 
 class AlignmentData:
@@ -21,6 +24,8 @@ class AlignmentData:
 
 
 def resize_test(alignment_data, size):
+    if len(alignment_data.alignment[0]) <= size:
+        return alignment_data
     b = -1
     for j in range(len(alignment_data.alignment[0]) - size + 1):
         sol = True
@@ -91,17 +96,18 @@ def process_data(output_dir='data/sequences', balibase_dir='bb3_release'):
         file_prefixes.sort()
         for file_prefix in file_prefixes:
             alignment_data = parse_file(root, file_prefix)
-            if len(alignment_data.sequences) > MAX_SEQUENCES_NUM:
-                continue
-            data.append(alignment_data)
+            if len(alignment_data.sequences) <= MAX_SEQUENCES_NUM:
+                data.append(alignment_data)
 
     for i in range(len(data)):
         if i < SMALL_TESTS_FREQ * len(data):
             data[i] = resize_test(data[i], SMALL_SEQUENCE_LEN)
         elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ) * len(data):
             data[i] = resize_test(data[i], MEDIUM_SEQUENCE_LEN)
-        else:
+        elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ + LARGE_TEST_FREQ):
             data[i] = resize_test(data[i], LARGE_SEQUENCE_LEN)
+        else:
+            data[i] = resize_test(data[i], EXTRA_LARGE_SEQUENCE_LEN)
         save_to_file(data[i], os.path.join(output_dir, data[i].file_prefix + '.txt'))
 
     with open('data/sequences/all_files.txt', 'w') as f:

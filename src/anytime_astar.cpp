@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "common.h"
 
-AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, double w) {
+AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMatrix &mtx, double w, int max_runtime_secs) {
     assert(w >= 1.0);
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
@@ -23,7 +23,7 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
 
     FValuesStorage st;
     st.update_f_value(start_node, hc.calculate_heuristic(start_node));
-    AnytimeProgressTracker tracker;
+    AnytimeProgressTracker tracker(max_runtime_secs);
     while (!open.is_empty()) {
         auto[best_node, g, f] = open.get_best_node();
         if (st.get_f_value(best_node) >= f_incumbent)

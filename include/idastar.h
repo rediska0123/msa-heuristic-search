@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx);
+SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx, int max_runtime_secs = 60);
 
 class IDAStarProgressTracker: public ProgressTracker {
 public:

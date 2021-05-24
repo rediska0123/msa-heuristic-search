@@ -29,13 +29,13 @@ int search(IDAStarProgressTracker &tracker, const Sequences &seqs, const ScoreMa
     return min_bound;
 }
 
-SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx) {
+SearchResult IDAStar(const Sequences &sequences, const ScoreMatrix &mtx, int max_runtime_secs) {
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
     int bound = hc.calculate_heuristic(start_node);
     std::vector<Node> path = {start_node};
-    IDAStarProgressTracker tracker;
+    IDAStarProgressTracker tracker(max_runtime_secs);
     while (true) {
         bound = search(tracker, sequences, mtx, hc, goal_node, path, 0, bound);
         if (tracker.need_stop())

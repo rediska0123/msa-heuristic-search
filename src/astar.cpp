@@ -4,7 +4,7 @@
 #include "common.h"
 #include <algorithm>
 
-SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
+SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx, int max_runtime_secs) {
     HeuristicCalculator hc = HeuristicCalculator(sequences, mtx);
 
     NodeStorage storage;
@@ -14,7 +14,7 @@ SearchResult AStar(const Sequences &sequences, const ScoreMatrix &mtx) {
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
     open.add_node(start_node, 0, hc.calculate_heuristic(start_node));
-    ProgressTracker tracker;
+    ProgressTracker tracker(max_runtime_secs);
     while (!open.is_empty()) {
         if (tracker.on_new_iteration(open, closed))
             return SearchResult(AlignmentOutput(), tracker);
