@@ -1,19 +1,18 @@
 import os
 import tarfile
 from urllib import request
-import numpy as np
 
 SMALL_SEQUENCE_LEN = 10
 MEDIUM_SEQUENCE_LEN = 20
 LARGE_SEQUENCE_LEN = 40
-EXTRA_LARGE_SEQUENCE_LEN = np.inf
+EXTRA_LARGE_SEQUENCE_LEN = 100
 
 SMALL_TESTS_FREQ = 0.4
 MEDIUM_TESTS_FREQ = 0.3
 LARGE_TEST_FREQ = 0.2
 EXTRA_LARGE_TEST_FREQ = 0.1
 
-MAX_SEQUENCES_NUM = 10
+MAX_SEQUENCES_NUM = 5
 
 
 class AlignmentData:
@@ -104,7 +103,7 @@ def process_data(output_dir='data/sequences', balibase_dir='bb3_release'):
             data[i] = resize_test(data[i], SMALL_SEQUENCE_LEN)
         elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ) * len(data):
             data[i] = resize_test(data[i], MEDIUM_SEQUENCE_LEN)
-        elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ + LARGE_TEST_FREQ):
+        elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ + LARGE_TEST_FREQ) * len(data):
             data[i] = resize_test(data[i], LARGE_SEQUENCE_LEN)
         else:
             data[i] = resize_test(data[i], EXTRA_LARGE_SEQUENCE_LEN)
