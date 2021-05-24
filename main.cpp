@@ -83,10 +83,10 @@ void save_table_header(string path, const vector<int> &c_for_peastar, const vect
     f.close();
 }
 
-void save_new_output(const TestOutput &outp,
+void save_new_output(string path, const TestOutput &outp,
                      const vector<int> &c_for_peastar,
                      const vector<double> &w_for_anytime_astar) {
-    ofstream f("single_test_results.csv", ios::out | ios::app);
+    ofstream f(path, ios::out | ios::app);
     f << outp.test.test_name << ",";
     for (const Sequence &s: outp.test.sequences)
         f << (int) s.size() << " ";
@@ -121,7 +121,7 @@ void save_new_output(const TestOutput &outp,
 }
 
 int get_test_timeout(const Test &test) {
-    return 60;
+    return 5;
 }
 
 #define RUN_N_TIMES(run_times, algo_name, run_command) \
@@ -175,12 +175,12 @@ void generate_algorithms_results(string path,
             cout << " Running AnytimeAStar(w=" << w << ")..." << endl;
             AnytimeAStarSearchResult anytime_astar_output;
             RUN_N_TIMES(run_times, anytime_astar,
-                        AnytimeAStar(test.sequences, test.mtx, w_for_anytime_astar[i], timeout));
+                        AnytimeAStar(test.sequences, test.mtx, w, timeout));
             avg_anytime_astar_run_times.push_back(avg_anytime_astar_run_time);
             anytime_astar_outputs.push_back(anytime_astar_output);
         }
 
-        save_new_output(TestOutput{test,
+        save_new_output(path, TestOutput{test,
                                    progressive_alignment_output, avg_progressive_alignment_run_time,
                                    astar_output, avg_astar_run_time,
                                    idastar_output, avg_idastar_run_time,
