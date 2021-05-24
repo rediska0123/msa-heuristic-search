@@ -14,43 +14,30 @@ std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment) {
 }
 
 std::tuple<Node, int, int> Open::get_best_node() {
-    _remove_old_nodes();
-    auto[f, best_node] = _nodes.top();
-    _nodes.pop();
-    return {best_node, _g_values[best_node], f};
+    auto[f, best_node] = *_sorted_nodes.begin();
+    int g = _f_g_values[best_node].second;
+    _sorted_nodes.erase(_sorted_nodes.begin());
+    _f_g_values.erase(best_node);
+    return {best_node, g, f};
 }
 
 void Open::add_node(const Node &node, int g, int f) {
-    if (_g_values.find(node) == _g_values.end() || _g_values[node] >= g) {
-        _nodes.push({f, node});
-        _g_values[node] = g;
+    auto f_g_node = _f_g_values.find(node);
+    if (f_g_node == _f_g_values.end() || f_g_node->second.first > f) {
+        if (f_g_node != _f_g_values.end())
+            _sorted_nodes.erase({f_g_node->second.first, node});
+        _sorted_nodes.insert({f, node});
+        _f_g_values[node] = {f, g};
         _storage->add_node(node);
     }
 }
 
 bool Open::is_empty() {
-    _remove_old_nodes();
-    return _nodes.empty();
-}
-
-void Open::_remove_old_nodes() {
-    while (!_nodes.empty() && _closed->was_expanded(_nodes.top().second)) {
-        _nodes.pop();
-    }
-}
-
-std::vector<Node> Open::get_nodes() {
-    std::vector<Node> nodes;
-    std::priority_queue<std::pair<int, Node>, std::vector<std::pair<int, Node>>, Comparator> tmp = _nodes;
-    while (!tmp.empty()) {
-        nodes.push_back(tmp.top().second);
-        tmp.pop();
-    }
-    return nodes;
+    return _sorted_nodes.empty();
 }
 
 size_t Open::size() const {
-    return _nodes.size();
+    return _sorted_nodes.size();
 }
 
 void Closed::delete_node(const Node &node) {
@@ -68,13 +55,6 @@ int Closed::g_value(const Node &node) {
 void Closed::add_node(const Node &node, int g) {
     _g_values[node] = g;
     _storage->add_node(node);
-}
-
-std::vector<Node> Closed::get_nodes() {
-    std::vector<Node> nodes;
-    for (std::pair<Node, int> p : _g_values)
-        nodes.push_back(p.first);
-    return nodes;
 }
 
 size_t Closed::size() const {

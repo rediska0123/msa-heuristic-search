@@ -31,6 +31,8 @@ public:
 
     bool operator==(const Node &other) const;
 
+    bool operator<(const Node &other) const;
+
     int operator[](int index) const;
 
     size_t size() const;

@@ -10,6 +10,8 @@
 #include <unordered_set>
 #include <algorithm>
 
+using namespace std;
+
 const Sequences test_sequences1 = {{'A', 'C', 'G', 'H'},
                                    {'C', 'F', 'G'},
                                    {'E', 'A', 'C'}};
@@ -30,10 +32,16 @@ const Sequences test_sequences2 = {{'A', 'A'},
 const ScoreMatrix test_matrix2 = {{'A', {{'A', 1}, {'-', 1}}},
                                   {'-', {{'A', 1}, {'-', 0}}}};
 
+const Sequences test_sequences3 = {{'A'},
+                                   {'A', 'A'},
+                                   {'A', 'A', 'A'}};
+const ScoreMatrix test_matrix3 = {{'-', {{'-', 1}, {'A', 2}}},
+                                  {'A', {{'-', 2}, {'A', -1}}}};
+
 template<typename T>
 void assert_eq(const T &found, const T &expected) {
     if (found != expected) {
-        std::cerr << "Found " << found << ", expected " << expected << std::endl;
+        cerr << "Found " << found << ", expected " << expected << endl;
         assert(false);
     }
 }
@@ -50,11 +58,11 @@ void test_compute_cost() {
 
 void test_get_successors() {
     assert(Node({0, 0, 1}).get_successors(test_sequences1, nullptr) ==
-           (std::unordered_set<Node, NodeHashFunction>{Node({0, 0, 2}), Node({0, 1, 1}), Node({0, 1, 2}),
-                                                       Node({1, 0, 1}), Node({1, 0, 2}), Node({1, 1, 1}),
-                                                       Node({1, 1, 2})}));
+           (unordered_set<Node, NodeHashFunction>{Node({0, 0, 2}), Node({0, 1, 1}), Node({0, 1, 2}),
+                                                  Node({1, 0, 1}), Node({1, 0, 2}), Node({1, 1, 1}),
+                                                  Node({1, 1, 2})}));
     assert(Node({2, 2, 3}).get_successors(test_sequences1, nullptr) ==
-           (std::unordered_set<Node, NodeHashFunction>{Node({2, 3, 3}), Node({3, 2, 3}), Node({3, 3, 3})}));
+           (unordered_set<Node, NodeHashFunction>{Node({2, 3, 3}), Node({3, 2, 3}), Node({3, 3, 3})}));
     assert(Node({4, 3, 3}).get_successors(test_sequences1, nullptr).empty());
 }
 
@@ -86,6 +94,9 @@ void test_AStar() {
 
     result = AStar(test_sequences2, test_matrix2);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+
+    result = AStar(test_sequences3, test_matrix3);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix3), 5);
 }
 
 void test_PEAStar() {
@@ -94,6 +105,9 @@ void test_PEAStar() {
 
     result = PEAStar(test_sequences2, test_matrix2, 20);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+
+    result = PEAStar(test_sequences3, test_matrix3, 10);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix3), 5);
 }
 
 void test_AnytimeAStar() {
@@ -102,6 +116,9 @@ void test_AnytimeAStar() {
 
     result = AnytimeAStar(test_sequences2, test_matrix2, 9);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+
+    result = AnytimeAStar(test_sequences3, test_matrix3, 3);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix3), 5);
 }
 
 void test_IDAStar() {
@@ -110,6 +127,9 @@ void test_IDAStar() {
 
     result = IDAStar(test_sequences2, test_matrix2);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+
+    result = IDAStar(test_sequences3, test_matrix3);
+    assert_eq(calculate_alignment_score(result.alignment, test_matrix3), 5);
 }
 
 std::pair<Sequences, ScoreMatrix> gen_simple_test() {

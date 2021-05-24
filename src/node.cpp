@@ -83,3 +83,12 @@ size_t Node::size() const {
 const Node *Node::get_parent() const {
     return _parent;
 }
+
+bool Node::operator<(const Node &other) const {
+    if ((int)_indices.size() != (int)other._indices.size())
+        return (int)_indices.size() < (int)other._indices.size();
+    for (int i = 0; i < (int)_indices.size(); i++)
+        if (_indices[i] != other._indices[i])
+            return _indices[i] < other._indices[i];
+    return false;
+}

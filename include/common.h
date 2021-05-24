@@ -5,6 +5,7 @@
 #include "node.h"
 #include <unordered_map>
 #include <chrono>
+#include <set>
 
 typedef std::vector<Sequence> AlignmentOutput;
 
@@ -26,26 +27,13 @@ public:
 
     bool is_empty();
 
-    std::vector<Node> get_nodes();
-
     size_t size() const;
 
 private:
-    struct Comparator {
-        constexpr bool operator()(
-                std::pair<int, Node> const &a,
-                std::pair<int, Node> const &b)
-        const noexcept {
-            return a.first > b.first;
-        }
-    };
-
     Closed *_closed;
     NodeStorage *_storage;
-    std::priority_queue<std::pair<int, Node>, std::vector<std::pair<int, Node>>, Comparator> _nodes;
-    std::unordered_map<Node, int, NodeHashFunction> _g_values;
-
-    void _remove_old_nodes();
+    std::set<std::pair<int, Node>> _sorted_nodes;
+    std::unordered_map<Node, std::pair<int, int>, NodeHashFunction> _f_g_values;
 };
 
 class Closed {
@@ -59,8 +47,6 @@ public:
     bool was_expanded(const Node &node);
 
     int g_value(const Node &node);
-
-    std::vector<Node> get_nodes();
 
     size_t size() const;
 
