@@ -28,7 +28,7 @@
 * `results.csv` : результаты работы алгоритмов на группе больших и маленьких тестов
 * `single_test_result.csv` : более подробные результаты для тестов из `data/test_config.txt`. 
 
-Эти файлы также можно скачать [здесь](https://drive.google.com/file/d/1f-8X8EvqKBfoZlef4rF2rAQ1FSJC7N-9/view?usp=sharing).
+Эти файлы также можно скачать [здесь](https://drive.google.com/drive/folders/1urFaWfg3ocT11_Kk40pc_g2cCnSoVl9Y?usp=sharing) (оба файла необходимо положить в корень репозитория).
 
 
 # Запуск тестов к алгоритмам
