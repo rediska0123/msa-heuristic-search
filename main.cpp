@@ -15,7 +15,7 @@
 using namespace std;
 
 const vector<int> c_for_peastar = {40, 55, 70};
-const vector<double> w_for_anytime_astar = {100.0 / 99.0, 2, 4};
+const vector<double> w_for_anytime_astar = {100.0 / 99.0, 5, 20, 50};
 
 struct Test {
     string test_name;

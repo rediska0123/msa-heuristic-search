@@ -23,7 +23,7 @@ std::tuple<Node, int, int> Open::get_best_node() {
 
 void Open::add_node(const Node &node, int g, int f) {
     auto f_g_node = _f_g_values.find(node);
-    if (f_g_node == _f_g_values.end() || f_g_node->second.first > f) {
+    if (f_g_node == _f_g_values.end() || f_g_node->second.second > g) {
         if (f_g_node != _f_g_values.end())
             _sorted_nodes.erase({f_g_node->second.first, node});
         _sorted_nodes.insert({f, node});
