@@ -75,18 +75,21 @@ public:
 
     void add_node(const Node &node);
 
-    Node* get_node_ptr(const Node &node) const;
+    Node *get_node_ptr(const Node &node) const;
 
     void clear();
+
+    size_t size();
+
 private:
     std::unordered_map<Node, Node *, NodeHashFunction> _nodes;
 };
 
 class ProgressTracker {
 public:
-    explicit ProgressTracker(int max_runtime_secs = 60):
-        _max_nodes_in_memory(0), _iterations_num(0), _max_runtime_secs(max_runtime_secs),
-        _start_time(std::chrono::system_clock::now()) {};
+    explicit ProgressTracker(int max_runtime_secs = 60) :
+            _max_nodes_in_memory(0), _iterations_num(0), _max_runtime_secs(max_runtime_secs),
+            _start_time(std::chrono::system_clock::now()) {};
 
     bool on_new_iteration(const Open &open, const Closed &closed);
 
