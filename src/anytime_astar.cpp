@@ -17,7 +17,7 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
 
     auto[start_node, goal_node] = get_start_and_goal_nodes(sequences);
 
-    open.add_node(start_node, 0, int(w * hc.calculate_heuristic(start_node)));
+    open.add_node(start_node, 0, w * hc.calculate_heuristic(start_node));
     Node incumbent({});
     int f_incumbent = INF;
 
@@ -42,7 +42,7 @@ AnytimeAStarSearchResult AnytimeAStar(const Sequences &sequences, const ScoreMat
                     continue;
                 if (closed.was_expanded(nxt))
                     closed.delete_node(nxt);
-                open.add_node(nxt, g + c, int(w * h + g + c));
+                open.add_node(nxt, g + c, w * h + g + c);
                 st.update_f_value(nxt, g + c + h);
             }
         }
@@ -70,7 +70,8 @@ AnytimeAStarSearchResult::AnytimeAStarSearchResult(const AlignmentOutput &a, con
 void FValuesStorage::update_f_value(const Node &n, int new_f) {
     if (_f_value.count(n) && _f_value[n] < new_f)
         return;
-    _f_values.erase(_f_value[n]);
+    if (_f_values.count(_f_value[n]))
+        _f_values.erase(_f_values.lower_bound(_f_value[n]));
     _f_value[n] = new_f;
     _f_values.insert(new_f);
 }
@@ -84,6 +85,6 @@ int FValuesStorage::get_min_f_value() const {
 int FValuesStorage::get_f_value(const Node &n) {
     int f = _f_value[n];
     _f_value.erase(n);
-    _f_values.erase(f);
+    _f_values.erase(_f_values.lower_bound(f));
     return f;
 }

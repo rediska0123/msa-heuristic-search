@@ -13,7 +13,7 @@ std::ostream &operator<<(std::ostream &o, const AlignmentOutput &alignment) {
     return o;
 }
 
-std::tuple<Node, int, int> Open::get_best_node() {
+std::tuple<Node, int, double> Open::get_best_node() {
     auto[f, best_node] = *_sorted_nodes.begin();
     int g = _f_g_values[best_node].second;
     _sorted_nodes.erase(_sorted_nodes.begin());
@@ -21,7 +21,7 @@ std::tuple<Node, int, int> Open::get_best_node() {
     return {best_node, g, f};
 }
 
-void Open::add_node(const Node &node, int g, int f) {
+void Open::add_node(const Node &node, int g, double f) {
     auto f_g_node = _f_g_values.find(node);
     if (f_g_node == _f_g_values.end() || f_g_node->second.second > g) {
         if (f_g_node != _f_g_values.end())

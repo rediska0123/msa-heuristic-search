@@ -21,9 +21,9 @@ class Open {
 public:
     Open(Closed *closed, NodeStorage *storage) : _closed(closed), _storage(storage) {};
 
-    std::tuple<Node, int, int> get_best_node();
+    std::tuple<Node, int, double> get_best_node();
 
-    void add_node(const Node &node, int g, int f);
+    void add_node(const Node &node, int g, double f);
 
     bool is_empty();
 
@@ -32,8 +32,8 @@ public:
 private:
     Closed *_closed;
     NodeStorage *_storage;
-    std::set<std::pair<int, Node>> _sorted_nodes;
-    std::unordered_map<Node, std::pair<int, int>, NodeHashFunction> _f_g_values;
+    std::set<std::pair<double, Node>> _sorted_nodes;
+    std::unordered_map<Node, std::pair<double, int>, NodeHashFunction> _f_g_values;
 };
 
 class Closed {

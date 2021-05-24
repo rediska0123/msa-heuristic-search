@@ -110,15 +110,26 @@ void test_PEAStar() {
     assert_eq(calculate_alignment_score(result.alignment, test_matrix3), 5);
 }
 
+void test_bounds(const AnytimeAStarSearchResult &res, const ScoreMatrix &m) {
+    int score = calculate_alignment_score(res.alignment, m);
+    for (const std::pair <int, int> &a : res.bounds) {
+        assert(a.first <= score);
+        assert(a.second >= score);
+    }
+}
+
 void test_AnytimeAStar() {
-    SearchResult result = AnytimeAStar(test_sequences1, test_matrix1, 10);
+    AnytimeAStarSearchResult result = AnytimeAStar(test_sequences1, test_matrix1, 10);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix1), 36);
+    test_bounds(result, test_matrix1);
 
     result = AnytimeAStar(test_sequences2, test_matrix2, 9);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix2), 6);
+    test_bounds(result, test_matrix2);
 
     result = AnytimeAStar(test_sequences3, test_matrix3, 3);
     assert_eq(calculate_alignment_score(result.alignment, test_matrix3), 5);
+    test_bounds(result, test_matrix3);
 }
 
 void test_IDAStar() {
@@ -154,7 +165,7 @@ void test_same_aligment_scores() {
         auto[seqs, m] = gen_simple_test();
         SearchResult astar = AStar(seqs, m);
         SearchResult peastar = PEAStar(seqs, m, 10);
-        SearchResult anytime_astar = AnytimeAStar(seqs, m, double(rand() % 10 + 1));
+        AnytimeAStarSearchResult anytime_astar = AnytimeAStar(seqs, m, double(rand() % 10 + 1));
         SearchResult idastar = IDAStar(seqs, m);
         int astar_score = calculate_alignment_score(astar.alignment, m);
         int peastar_score = calculate_alignment_score(peastar.alignment, m);
@@ -163,6 +174,7 @@ void test_same_aligment_scores() {
         assert_eq(astar_score, peastar_score);
         assert_eq(astar_score, anytime_astar_score);
         assert_eq(astar_score, idastar_score);
+        test_bounds(anytime_astar, m);
     }
 }
 
