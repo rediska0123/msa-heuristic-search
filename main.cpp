@@ -14,9 +14,6 @@
 
 using namespace std;
 
-const vector<int> c_for_peastar = {40, 55, 70};
-const vector<double> w_for_anytime_astar = {100.0 / 99.0, 5, 20, 50};
-
 struct Test {
     string test_name;
     string matrix_name;
@@ -44,16 +41,16 @@ struct TestOutput {
     vector<double> avg_anytime_astar_runtime_ms;
 };
 
-vector<Test> load_tests() {
+vector<Test> load_tests(string path, const vector<string> &matrices) {
     cout << "Loading tests..." << endl;
     vector<string> all_files;
-    ifstream f("data/sequences/all_files.txt");
+    ifstream f(path);
     string filename;
     while (f >> filename)
         all_files.push_back(filename);
     vector<Test> tests;
     for (const string &sequences_file : all_files)
-        for (const string &matrix_name : {"PAM250"}) { // {"BLOSUM45", "PAM250"}) {
+        for (const string &matrix_name : matrices) {
             ScoreMatrix mtx = parse_matrix_file("data/matrices/" + matrix_name + ".txt");
             pair<Sequences, AlignmentOutput> alignment = parse_data_file("data/sequences/" + sequences_file);
             tests.push_back(Test{sequences_file, matrix_name, alignment.first, mtx, alignment.second});
@@ -64,14 +61,14 @@ vector<Test> load_tests() {
 int max_sequence_len(const Sequences &seqs) {
     int max_len = 0;
     for (const Sequence &seq : seqs)
-        max_len = max(max_len, (int)seq.size());
+        max_len = max(max_len, (int) seq.size());
     return max_len;
 }
 
-void save_table_header() {
-    ofstream f("results.csv");
+void save_table_header(string path, const vector<int> &c_for_peastar, const vector<double> &w_for_anytime_astar) {
+    ofstream f(path);
     f << "Test,Sequence lengths,Matrix,Sequences number,Maximum sequence len,PA score,PA runtime (micros),"
-      << "A* score,A* memory,A* iterations,A* runtime (micros),"
+      << "A* score,A* memory,A* iterations,A* runtime (micros),";
       << "IDA* score,IDA* memory,IDA* iterations,IDA* runtime (micros),";
     for (int c : c_for_peastar) {
         const string name = "PEA*(c=" + to_string(c) + ")";
@@ -86,12 +83,14 @@ void save_table_header() {
     f.close();
 }
 
-void save_new_output(const TestOutput &outp) {
-    ofstream f("results.csv", ios::out | ios::app);
+void save_new_output(const TestOutput &outp,
+                     const vector<int> &c_for_peastar,
+                     const vector<double> &w_for_anytime_astar) {
+    ofstream f("single_test_results.csv", ios::out | ios::app);
     f << outp.test.test_name << ",";
     for (const Sequence &s: outp.test.sequences)
-        f << (int)s.size() << " ";
-    f << "," << outp.test.matrix_name << "," << (int)outp.test.sequences.size() << ","
+        f << (int) s.size() << " ";
+    f << "," << outp.test.matrix_name << "," << (int) outp.test.sequences.size() << ","
       << max_sequence_len(outp.test.sequences) << ","
       << calculate_alignment_score(outp.progressive_alignment_result, outp.test.mtx) << ","
       << outp.avg_progressive_alignment_runtime_ms << ",";
@@ -101,18 +100,19 @@ void save_new_output(const TestOutput &outp) {
     f << calculate_alignment_score(outp.idastar_result.alignment, outp.test.mtx) << ","
       << outp.idastar_result.max_nodes_in_memory << "," << outp.idastar_result.iterations_num << ","
       << outp.avg_idastar_runtime_ms << ",";
-    for (int i = 0; i < (int)c_for_peastar.size(); i++)
+    for (int i = 0; i < (int) c_for_peastar.size(); i++)
         f << calculate_alignment_score(outp.peastar_result[i].alignment, outp.test.mtx) << ","
           << outp.peastar_result[i].max_nodes_in_memory << "," << outp.peastar_result[i].iterations_num << ","
           << outp.avg_peastar_runtime_ms[i] << ",";
-    for (int i = 0; i < (int)w_for_anytime_astar.size(); i++) {
+    for (int i = 0; i < (int) w_for_anytime_astar.size(); i++) {
         f << calculate_alignment_score(outp.anytime_astar_result[i].alignment, outp.test.mtx) << ","
-          << outp.anytime_astar_result[i].max_nodes_in_memory << "," << outp.anytime_astar_result[i].iterations_num << ","
+          << outp.anytime_astar_result[i].max_nodes_in_memory << "," << outp.anytime_astar_result[i].iterations_num
+          << ","
           << outp.avg_anytime_astar_runtime_ms[i] << ",";
-        for (const auto & bound : outp.anytime_astar_result[i].bounds)
+        for (const auto &bound : outp.anytime_astar_result[i].bounds)
             f << bound.first << " ";
         f << ",";
-        for (const auto & bound : outp.anytime_astar_result[i].bounds)
+        for (const auto &bound : outp.anytime_astar_result[i].bounds)
             f << bound.second << " ";
         f << ",";
     }
@@ -121,7 +121,7 @@ void save_new_output(const TestOutput &outp) {
 }
 
 int get_test_timeout(const Test &test) {
-    int size = (int)test.alignment[0].size();
+    int size = (int) test.alignment[0].size();
     if (size <= 10)
         return 8;
     if (size <= 20)
@@ -140,10 +140,14 @@ double avg_##algo_name##_run_time = \
             ((double)run_times);
 
 
-void generate_algorithms_results(const vector<Test> &tests, int run_times = 1) {
+void generate_algorithms_results(string path,
+                                 const vector<Test> &tests,
+                                 const vector<int> &c_for_peastar,
+                                 const vector<double> &w_for_anytime_astar,
+                                 int run_times = 1) {
     cout << "Running algorithms..." << endl;
 
-    save_table_header();
+    save_table_header(path, c_for_peastar, w_for_anytime_astar);
 
     for (int i = 0; i < (int)tests.size(); i++) {
         const Test &test = tests[i];
@@ -184,18 +188,29 @@ void generate_algorithms_results(const vector<Test> &tests, int run_times = 1) {
         }
 
         save_new_output(TestOutput{test,
-                                     progressive_alignment_output, avg_progressive_alignment_run_time,
-                                     astar_output, avg_astar_run_time,
-                                     idastar_output, avg_idastar_run_time,
-                                     peastar_outputs, avg_peastar_run_times,
-                                     anytime_astar_outputs, avg_anytime_astar_run_times});
+                                   progressive_alignment_output, avg_progressive_alignment_run_time,
+                                   astar_output, avg_astar_run_time,
+                                   idastar_output, avg_idastar_run_time,
+                                   peastar_outputs, avg_peastar_run_times,
+                                   anytime_astar_outputs, avg_anytime_astar_run_times},
+                        c_for_peastar,
+                        w_for_anytime_astar);
     }
 }
 
 int main() {
-    vector<Test> tests = load_tests();
-    generate_algorithms_results(tests);
+    vector<Test> tests;
+    vector<int> c_for_peastar = {40, 55, 70};
+    vector<double> w_for_anytime_astar = {100.0 / 99.0, 5, 20, 50};
+    tests = load_tests("data/sequences/all_files.txt", {"PAM250"});
+    generate_algorithms_results("single_test_results.csv", tests, c_for_peastar, w_for_anytime_astar);
 
+    c_for_peastar.clear();
+    for (int i = 0; i < 100; i += 5) {
+        c_for_peastar.push_back(i);
+    }
+    tests = load_tests("data/test_config.txt", {"PAM250"});
+    generate_algorithms_results("single_test_results.csv", tests, c_for_peastar, w_for_anytime_astar);
     return 0;
 }
 
