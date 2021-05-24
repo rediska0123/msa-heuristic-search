@@ -196,7 +196,7 @@ int main() {
     vector<int> c_for_peastar = {30, 50, 70};
     vector<double> w_for_anytime_astar = {100.0 / 99.0, 5, 20, 50};
     tests = load_tests("data/sequences/all_files.txt", {"PAM250"});
-    generate_algorithms_results("single_test_results.csv", tests, c_for_peastar, w_for_anytime_astar);
+    generate_algorithms_results("results.csv", tests, c_for_peastar, w_for_anytime_astar);
 
     c_for_peastar.clear();
     for (int i = 0; i < 100; i += 5) {
