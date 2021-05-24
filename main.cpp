@@ -194,7 +194,7 @@ void generate_algorithms_results(string path,
 int main() {
     vector<Test> tests;
     vector<int> c_for_peastar = {30, 50, 70};
-    vector<double> w_for_anytime_astar = {100.0 / 99.0, 1.1, 1.5, 2};
+    vector<double> w_for_anytime_astar = {1.001, 100.0 / 99.0, 1.1, 1.5};
     tests = load_tests("data/sequences/all_files.txt", {"PAM250"});
     generate_algorithms_results("results.csv", tests, c_for_peastar, w_for_anytime_astar);
 
