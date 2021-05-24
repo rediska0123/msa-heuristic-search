@@ -84,6 +84,10 @@ void NodeStorage::clear() {
     _nodes.clear();
 }
 
+size_t NodeStorage::size() {
+    return _nodes.size();
+}
+
 int calculate_alignment_score(const AlignmentOutput &alignment, const ScoreMatrix &mtx) {
     int score = 0;
     if (alignment.empty())
