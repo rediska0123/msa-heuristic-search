@@ -14,7 +14,7 @@
 
 using namespace std;
 
-const vector<int> c_for_peastar = {40, 55, 70};
+const vector<int> c_for_peastar = {30, 50, 70};
 const vector<double> w_for_anytime_astar = {100.0 / 99.0, 5, 20, 50};
 
 struct Test {
@@ -121,14 +121,7 @@ void save_new_output(const TestOutput &outp) {
 }
 
 int get_test_timeout(const Test &test) {
-    int size = (int)test.alignment[0].size();
-    if (size <= 10)
-        return 8;
-    if (size <= 20)
-        return 30;
-    if (size <= 40)
-        return 60;
-    return 10 * 60;
+    return 60;
 }
 
 #define RUN_N_TIMES(run_times, algo_name, run_command) \

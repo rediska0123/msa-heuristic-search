@@ -82,5 +82,8 @@ int FValuesStorage::get_min_f_value() const {
 }
 
 int FValuesStorage::get_f_value(const Node &n) {
-    return _f_value[n];
+    int f = _f_value[n];
+    _f_value.erase(n);
+    _f_values.erase(f);
+    return f;
 }
