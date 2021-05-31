@@ -121,7 +121,10 @@ void save_new_output(string path, const TestOutput &outp,
 }
 
 int get_test_timeout(const Test &test) {
-    return 10;
+    if (max_sequence_len(test.sequences) > 25) {
+        return 300;
+    }
+    return 30;
 }
 
 #define RUN_N_TIMES(run_times, algo_name, run_command) \

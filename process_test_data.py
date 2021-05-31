@@ -3,14 +3,14 @@ import tarfile
 from urllib import request
 
 SMALL_SEQUENCE_LEN = 10
-MEDIUM_SEQUENCE_LEN = 20
-LARGE_SEQUENCE_LEN = 40
-EXTRA_LARGE_SEQUENCE_LEN = 100
+MEDIUM_SEQUENCE_LEN = 25
+LARGE_SEQUENCE_LEN = 75
+# EXTRA_LARGE_SEQUENCE_LEN = 100
 
-SMALL_TESTS_FREQ = 0.4
-MEDIUM_TESTS_FREQ = 0.3
+SMALL_TESTS_FREQ = 0.1
+MEDIUM_TESTS_FREQ = 0.7
 LARGE_TEST_FREQ = 0.2
-EXTRA_LARGE_TEST_FREQ = 0.1
+# EXTRA_LARGE_TEST_FREQ = 0.1
 
 MAX_SEQUENCES_NUM = 5
 
@@ -98,15 +98,14 @@ def process_data(output_dir='data/sequences', balibase_dir='bb3_release'):
             if len(alignment_data.sequences) <= MAX_SEQUENCES_NUM:
                 data.append(alignment_data)
 
+    data.sort(key=lambda d: len(d.sequences))
     for i in range(len(data)):
         if i < SMALL_TESTS_FREQ * len(data):
             data[i] = resize_test(data[i], SMALL_SEQUENCE_LEN)
         elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ) * len(data):
             data[i] = resize_test(data[i], MEDIUM_SEQUENCE_LEN)
-        elif i < (SMALL_TESTS_FREQ + MEDIUM_TESTS_FREQ + LARGE_TEST_FREQ) * len(data):
-            data[i] = resize_test(data[i], LARGE_SEQUENCE_LEN)
         else:
-            data[i] = resize_test(data[i], EXTRA_LARGE_SEQUENCE_LEN)
+            data[i] = resize_test(data[i], LARGE_SEQUENCE_LEN)
         save_to_file(data[i], os.path.join(output_dir, data[i].file_prefix + '.txt'))
 
     with open('data/sequences/all_files.txt', 'w') as f:
