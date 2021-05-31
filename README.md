@@ -43,21 +43,20 @@
 
 Среднее время работы всех алгоритмов на группе маленьких тестов:
 
-![cpu_small_tests](https://user-images.githubusercontent.com/35899997/119417931-95275f80-bcff-11eb-8a59-d752f0fd9b2f.png)
+![cpu_small_tests](https://user-images.githubusercontent.com/35899997/120228501-e54c7780-c253-11eb-9fd2-589c8337f49f.png)
 
 Среднее время работы алгоритмов (не включая IDA*) на группе больших тестов:
 
-![cpu_large_tests](https://user-images.githubusercontent.com/35899997/119417969-a8d2c600-bcff-11eb-8d1c-579d60bc7687.png)
+![cpu_large_tests](https://user-images.githubusercontent.com/35899997/120228509-eb425880-c253-11eb-9ad3-8c4bd0f96040.png)
 
 Производительность PEA* и AnytimeA* на группе маленьких тестов (относительно A*):
 
-![performance_small_tests](https://user-images.githubusercontent.com/35899997/119418087-e6375380-bcff-11eb-8d52-b5114c0d1178.png)
+![performance_small_tests](https://user-images.githubusercontent.com/35899997/120228519-f39a9380-c253-11eb-8677-7311b2bc5f9f.png)
 
 Ресурсы, затрачиваемые PEA* при различных значениях параметра:
 
-![pea_cutoff](https://user-images.githubusercontent.com/35899997/119418225-2c8cb280-bd00-11eb-8056-efea03506ce4.png)
+![pea_cutoff](https://user-images.githubusercontent.com/35899997/120228530-fac1a180-c253-11eb-92eb-975f91866ac3.png)
 
 Сходимость границ AnytimeA*:
 
-![anytime_convergence](https://user-images.githubusercontent.com/35899997/119418166-0d8e2080-bd00-11eb-9a86-71a885652590.png)
-
+![anytime_convergence](https://user-images.githubusercontent.com/35899997/120228539-ff865580-c253-11eb-9b47-aff8eef20e85.png)
